@@ -1,25 +1,11 @@
 # Rtech01.R: 大數據實務技術 - 01: 數據獲取與預處理
 # Jia-Sheng Heh (賀嘉生), 11/20/2020, revised from HUT02.R
 
-setwd("c:/Users/jsheh/Desktop/working/USC/AIbda/")
-
-########## (T) 课程教材和主要参考资料 ##########
-##== 1．教材
-# (1)《R語言與大數據編程實踐》，李倩星，電子工业出版社，2017.9 (ISBN 978-7-121-32634-9)
-# (2)《數據分析與數據挖掘實用教程 (Introduction to Big Data Technology)》殷復蓮，中國傳媒大學出版社，2017.9 (ISBN 978-7-5657-2160-1)
-##== 2．参考书目
-# (1)《數據挖掘: R語言實戰》黃文,王正林，電子工業出版社, 2014.6
-
-
-########## (P) 課前準備 ##########
-##== (1) 本單元課程為數據擷取，有許多要從網絡上抓取數據，故請隨時保持網絡連線
-##== (2) 從微信群組下載 本份講義程式檔 HUT02.R 放入本門課課程目錄，並以 RStudio開啟
-##== (3) 若見到本編程檔為中文亂碼，請以 File-->Reopen with Encoding --> UTF8，則可看到中文碼顯示
-##== (4) 修改本程式第4行，設定工作目錄為 本門課工作目錄
-##== (5) 依本課程(1B)指示，下載本門課所需之軟件包至本機備用 -- 下行安裝指令只需執行一次
+#setwd("c:/Users/jsheh/Desktop/working/USC/AIbda/")
 install.packages( c("RCurl","XML","rvest","xml2","curl","datesets","MASS","readxl","jsonlite") )
-##== (6) 從微信群組下載 HUT02data.zip 數據壓縮檔，解壓縮後放入 本門課工作目錄，作為本課程待用
-
+library(RCurl)                
+library(MASS)   #  library(datasets);     
+Insurance
 
 ########## (1) 數據來源 ##########
 
@@ -39,29 +25,12 @@ install.packages( c("RCurl","XML","rvest","xml2","curl","datesets","MASS","readx
 #    -- (5) 公開數據(Public)-—Microsoft Azure MarketPlace/DataMarket, The World Bank, SEC/Edgar, Wikipedia, IMDb, etc. – data that is publicly available on the Web
 #    -- (10) 文檔(Legacy documents)-—Archives of statements, insurance forms, medical record and customer correspondence
 
-#####=====*(1B) 內置數據集 [黃文3.1] =====#####
-##== R的軟件包(package)使用 [殷1.4.2,李1.7]
-#    -- (1) R的綜合典藏網(CRAN,Comprehensive R Archive Network)
-#            共有6400(2015)/8000(2016)/10000(2017)/13437(2018) 個軟件包(packages)
-nrow(available.packages())  #-- [1] 16235  --> 可用來看目前網絡上軟件包的數量
-#    -- (2) 安裝軟件包，只需執行一次，會從網路上下載安裝軟件包, 進入電腦的硬盤
-### install.packages("RCurl")     
-#    -- (3) 當安裝好後，就可以隨時在應用前,以 library() 調用此軟件包
-library(RCurl)                
-##== 搜尋網絡，協助R語言的編程
-#    -- (1) 搜尋網絡資源(如軟件包) --> 在搜尋引擎中下關鍵字 R package 所需功能的關鍵字
-#                                      如: R package web crawl 可以找網絡爬文的軟件包
-#    -- (2) 利用網絡協助編程偵錯 --> 在搜尋引擎中下關鍵字 R 遇到錯誤時的指令 錯誤信息
-#                                --> 建議可以加上 stackoverflow 網站，會有若干種直接的解答
-#                                      如爬文時發生錯誤: R getURL Could not resolve host stackoverflow
-### install.packages("datasets")
-library(MASS)   #  library(datasets);     
-Insurance
 
 #####===== (1C) 企業(檔案)數據 [黃文3.2] =====#####
 ##== (1)最常用的.csv檔案格式 (read.csv) [黃文3.2.1]
 write.csv(Insurance, "insurance.csv")
-csv1 = read.csv("insurance.csv");       csv2 <- read.table("insurance.csv")
+csv1 = read.csv("insurance.csv");       
+csv2 <- read.table("insurance.csv")
 
 ##== (2).txt檔案格式兩種讀取方法的比較 (read.table(), read.csv()) [黃文3.2.1]
 write.table(Insurance, "insurance.txt")
@@ -101,18 +70,16 @@ x <- xmlParse("county_h_10508.xml")   #-- 台灣鄉鎮郵區及英文名稱表
 xRoot = xmlRoot(x)
 x.df = xmlToDataFrame(xRoot)
 
+
 #####===== (1D) 物聯(設備)數據 =====#####
 
 ##== (1)..位置 [Data Taipei]
 library(jsonlite)
 download.file("https://tpairbox.blob.core.windows.net/blobfs/AirBoxData.gz","airbox.gz")
 airbox = fromJSON(gzfile("airbox.gz"))              #-- 台北市空氣盒子開放數據
-airbox.df = as.data.frame(airbox$entries);  dim(airbox.df);   head(airbox.df,2)   #-- 1198  9   #-- airbox.df <- as.data.frame(airbox[[2]])
-#                  time        device_id s_0 s_1 s_2 s_3 s_d0  s_t0 s_h0
-# 1 2017-10-13 22:16:11     28C2DDDD4423   0 100   1   0    3 27.62  100
-# 2 2017-10-13 22:16:13 781463DA0149A7F0   0 100   1   0   11 27.73   80
-# time：資料產生時間 device_id：AirBox ID  s_0：Message sequence number s_1：Battery power(0 ~ 100) s_2：Battery or Plug(0: Battery 1: Plug) 
-#                    s_3：Moving speed(Should be 0) s_d0：PM2.5 s_t0：Temperature s_h0：Humidity
+airbox.df = as.data.frame(airbox$entries);  
+dim(airbox.df);     # row / col
+head(airbox.df,2)   
 
 ##== (2)..UBIKE/GPS [Data Taipei]
 download.file("http://data.taipei/youbike","ubike.gz")
@@ -120,184 +87,32 @@ ubike = fromJSON(gzfile("ubike.gz"))                #-- 台北市UBIKE開放數�
 library(plyr)
 ubike.df = ldply(ubike[[2]], function(x) rbind(data.frame(x)))  
 
-#####===== (1E) 雲端(網絡)數據 [Munzert, Ch.13]-->(第3節)網絡爬虫 =====##### 
+##== (3) 網絡爬虫 =====##### 
 library(RCurl)
-
-##== (1).下載檔案(.txt, .csv, .json, .xml)格式 [Munzert, Ch.13]
-download.file("http://www.wcc.nrcs.usda.gov/ftpref/data/climate/table/temperature/history/california/19l03s_tavg.txt",
-              "ftpfile1.txt")                   #-- 加州天氣數據 --  原為ftp 現為www
-
-##== (2).FTP檔案列表 [Munzert, Ch.13]
-library(RCurl)
+#兩種寫法 download || ftplist.
+download.file("http://www.wcc.nrcs.usda.gov/ftpref/data/climate/table/temperature/history/california/19l03s_tavg.txt","ftpfile1.txt") 
 ftplist = "http://www.wcc.nrcs.usda.gov/ftpref/data/climate/table/temperature/history/california/"
 filelist = getURL(ftplist, dirlistonly = TRUE) #-- 加州天氣數據檔案列表
 
-##== (2D-3).網頁中表格格式 [http://rfunction.com/archives/1816]
+#網頁中格式
 url = "http://www.openintro.org/cont/donorProcess.php"
 result = postForm(url, name="David Diez", email="david@openintro.org", phone="857-288-8547")
-
-##== (2D-4).網頁+參數 格式 [Munzert, Ch.16]
 url = "http://www.amazon.com/s/ref=nb_sb_noss_2?url=node%3D2407749011&field-keywords=Apple"
 firstSearchPage = getURL(url)
 parsedFirstSearchPage = htmlParse(firstSearchPage)  #-- 亞馬遜網站之行動電話數據-->現會要求權限,無法取得
 
 
-########## (2) 數據獲取 ##########
-
-#####===== (2A) 數據獲取 [殷3.1] =====#####
-##== 數據獲取(Data Acquisition): 利用一種裝置，將來自各種數據源的數據，自動收集到一個裝置中
-#    -- 採樣方式(Sampling): 隔一段時間(採樣周期)對同一數據集重複採集
-##== 獲取數據的方法
-#    -- 公開信息: 有許多公開數據(open data)網站(如國家統計局等)可取得
-#    -- 內部的數據: 多為企業的內部數據,數據分析時需簽訂保密切結書方可取得
-#    -- 購買的數據: 有些企業以買賣數據方式經營
-#    -- 特殊方式(問卷,專家諮詢等): 企業針對特定議題,可內部自行/委請外部以調研方式進行
-#    -- 自行採集的數據: 除網絡搜尋或雲端爬文外，可(本專業教授之)設計物聯網系統採集數據
-
-#####=====*(2B) 信息搜索 [殷3.2] =====#####
-##== (網絡)信息搜索
-#    -- (1) 手工檢索: 手工添加檢索信息
-#    -- (2) 搜尋引擎檢索: 利用分類目錄或關鍵字,在特定的搜索引擎中查找所需信息
-#    -- (3) 查詢在線數據庫: 利用網上的在線數據庫進行查詢
-##== 搜尋引擎: 根據一定的策略,運用特定的計算機程序,從互聯網上搜集信息, 分做兩大類:
-#    -- (1) 全文搜索引擎: 按照關鍵字進行搜尋, 如: 百度(baidu),Google(google)
-#    -- (2) 目錄搜索引擎: 按照目錄進行檢索, 如: 搜狐(sohu),新浪(sina),網易(163),雅虎(yahoo)
-##== 搜尋引擎用技巧
-#    -- 提煉搜索關鍵詞
-#    -- 細化搜索條件
-#    -- 用好邏輯符號: AND, OR, NOT 或 + |, -, filetype, site, inurl
-#    -- 強制搜索: 英文雙引號
-#    -- 適時調整所用搜索引擎
-
-#####===== (2C) 搜尋引擎基本操作實驗 [殷3.5.1] =====#####
-##== 實驗1: 在百度中以關鍵字"北京空氣汚染" 搜尋
-#        --> 找到 環保部數據中心的全國城市的空氣質量日報
-
-
-########## (3) 網絡爬蟲 [殷3.3] [CYCU/河南工業大學資料/hiuDStest01.R] ##########
-
-#####===== (3A) 網絡爬虫定義 [殷3.3] =====#####
-##== 網絡爬虫(Crawler,Spider): 搜索引擎的生命
-#    -- 狹義: 遵循標準的http協議, 利用超鏈接和Web文檔檢索方法遍歷萬維網的軟件程序
-#    -- 廣義: 遵循http協議, 檢索Web文檔的軟件
-
-#####===== (3B) 網絡爬虫分類 [殷3.4.1] =====#####
-##== 依系統架構的分類
-#    -- 通用網絡爬虫: 根據網絡爬虫的控制策略隨機分配爬行任務的爬虫
-#    -- 主題網絡爬虫: 以特定主題為目標訪問頁面的爬虫
-##== 依不同應用的分類
-#    -- 批量型爬虫: 有比較明確的抓取範圍和目標，達到目標就停止抓取。
-#    -- 增量型爬虫: 會保持持續不斷的抓取，定期更新。
-#    -- 垂直型爬虫: 關注特定主題內容或屬於特定行業的網頁，只抓取相關的網頁。
-##== 依不同需求的分類
-#    -- 爬取網頁鏈接: 通過URL鏈接，得到HTML頁面中指定的鏈接，儲存鏈接，再依次爬取鏈接指向的HTML頁面及其中的鏈接。
-#    -- 爬取數據信息: 如文本信息、圖片信息，進行數據分析再做後續分析。
-
-#####===== (3C) 網絡爬虫基本原理 [殷3.3] =====#####
-##== 網站與瀏覽器
-#    -- 网站(Website): 互联网(Internet)上，依规则使用HTML等制作，以展示特定网页内容
-#                      人们可透过网站，来发布或浏览信息，获得所需的内容或网络服务
-##== URL (Universal Resource Locator): 以网络位置进行识别的因特网资源
-##== 网页浏览器(web browser): 一种应用程序，用以展示以URL标识的互联网资源
-#    -- 网络资源：包括网页、图片、影音或其他内容
-##== 瀏覽器訪問網站過程
-#    -- 瀏覽器向對方的網站服務器發出請求(HTTP request)，要求對方服務器返回目標地址的網頁內容
-#    -- 服務器進行一些操作，如從數據庫中查出相應用戶的數據等,然後準備好網頁的內容，
-#        將表示網頁內容的HTML代碼發送(回應HTTP response)給瀏覽器
-##== HTTP (HyperText Transfer Protocol) request/response
-#    -- 請求(request)-响應(response)模型: 用戶端(瀏覽器)向(網站)服務器發起請求，服務器做出响應
-#    -- HTTP request/response內容: 協議聲明,URI,協議版本,header,正文...
-
 #####=====*(3D) 簡單HTML網頁頁面爬取 [殷3.5.2] =====#####
-##== 數據爬取軟件包 RCurl
-#    -- 用C語言庫的HTTP庫的R接口，提供處理HTTP協議通訊的相關功能
-#    -- 核心函數getURL(): 主要處理GET請求，獲取其响應內容，並用到XPath語法(下一節)
-##== 實驗2: 爬取R網站首 https://www.r-project.org/ 的更新信息
-library(RCurl)
-#response = getURL("https://www.r-project.org/")
+library(RCurl)  # 數據爬取軟件包 RCurl
 response = getURL("http://www.weather.com.cn/weathern/101340101.shtml")
 print(response)
-# [1] "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>R: The R Project for Statistical Computing</title>\n\n    <link rel=\"icon\" type=\"image/png\" href=\"/favicon-32x32.png\" sizes=\"32x32\" />\n    <link rel=\"icon\" type=\"image/png\" href=\"/favicon-16x16.png\" sizes=\"16x16\" />\n\n ...
 
 
 ########## (4) 分析網頁信息 ##########
-
-#####===== (4A) HTML文檔基本結構 [殷3.3] =====#####
-##== Web頁面三大基本組件: 
-#    -- HTML (HyperText Markup Language): 網頁上的靜態內容, 如文字,表格,標題,列表等
-#    -- CSS (Cascading Style Sheets): 各類靜態內容的樣式 
-#    -- JavaScript: 為頁面添加動態效果, 也可修改HTML和CSS的內容
-##== HTML文檔結構: 是一種XML (eXtensible Markup Language)
-#       <!DOCTYPE html>                --> 文檔類型
-#           <html>                     --> HTML文檔
-#              <head>                      --> 文檔頭部分
-#                 <title>...</title>           --> 標題 
-#                 ...
-#              </head>
-#              <body>                      --> 文檔体部分
-#                 ...
-#              </body>
-#            </html>
-##== HTML常用標籤--標籤可具有識別屬性id和class
-#    -- 標題標籤: <h1>...</h1>, <h2>, <h3>, <h4>, <h5>, <h6>...</h6>
-#    -- 段落標籤: <p>...</p>
-#    -- 圖像標籤: <img>
-#    -- 超鏈結標籤: <a href=鏈結>文字或圖像</a>
-#    -- 容器標籤: <div>...</div>
-##== XML文檔解析軟件包XML
-#    -- XML文檔: 由樹狀的嵌套標簽結構構成，因而可以通過從根結點開始的路徑定位到一個位置
-#    -- XPATH表達式: 描述這種定位路徑的方法 (下一子節說明)
-##== 續實驗2:網頁解析 [殷3.5]
 response.parser = htmlParse(response, asText=TRUE)
 print(response.parser)
-# <!DOCTYPE html> 
-#   <html lang="en">
-#     <head>
-#       <meta charset="utf-8">
-#       ...
-#       <title>R: The R Project for Statistical Computing</title>
-#       <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
-#       ...
-#     </head>
-#     <body>                               ------> "/html/body/"
-#         <div class="container page">
-#            <div class="row">
-#                <div class="col-xs-12 col-sm-offset-1 col-sm-2 sidebar" role="navigation">
-#                    <div class="row">     ------> "/html/body/div/div/div/div"     
-#                        <div class="col-xs-6 col-sm-12">        <===== 從此找相對路徑
-#                            <p><a href="/"><img src="/Rlogo.png" width="100" height="78" alt="R"></a></p>
-#                            <p><small><a href="/">[Home]</a></small></p>
-#                            <h2 id="download">Download</h2>     -----> "/html/body/div/div/div/div/div/h2[1]"
-#                            <p><a href="http://cran.r-project.org/mirrors.html">CRAN</a></p>
-#                            <h2 id="r-project">R Project</h2>   -----> "/html/body/div/div/div/div/div/h2[2]"
-#                            <ul>
-#                               <li><a href="/about.html">About R</a></li> -----> "/html/body/div/div/div/div/div/ul/li[1]"
-#                               <li><a href="/logo/">Logo</a></li>         -----> "/html/body/div/div/div/div/div/ul/li[2]"
-#                   ...
-#                            </ul>
-#                         </div>
-#            ...
-#        </div>
-#     </body>
-#  </html>
 
-#####=====*(4B) XPATH表達式 [殷3.3] =====#####
-##== XPATH路徑表達式: 用來選取XML文檔中的節點或節點集
-##== XPATH的七種節點: 文本,元素,屬性, <爬文時關注前三者> 命名空間,處理指令, 注釋,及(根)文檔
-#    -- 文本: 如 <!DOCTYPE html> --> 根節點
-#    -- 元素: 如 <title>R: The R Project for Statistical Computing</title>
-#    -- 屬性: 如 charset="utf-8"
-##== 節點關係: 
-#    -- 父(parent),先輩(ancestor)
-#    -- 子(child),後代(descendant),
-#    -- 同胞(preceding-sibling, following-sibling)
-##== XPATH路徑表達式
-#    -- /  從根節點開始的路徑 (絕對路徑)
-#    -- // 從匹配選擇的當前節點開始的路徑 (相對路徑)
-#    -- @ 選取屬性
-#    -- * 通配符
-#    -- text() 選擇文本
-#    -- [] 過濾器
+
 
 #####===== (4C) 提取網頁樹: xpathSApply [殷3.3] =====#####
 ##== xpathSApply(XML檔, XPATH): 以XPATH 抓取XML樹上的分支
@@ -323,7 +138,6 @@ xpathSApply(response.parser, "//div[@class='col-xs-6 col-sm-12']/h2")  ##-- 以�
 library(RCurl)
 URL = "http://www.weather.com.cn/weathern/101340101.shtml"
 X = getURL(URL, .encoding="GB");  head(X)
-# [1] "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n<link rel=\"dns-prefetch\" href=\"http://i.tq121.com.cn\">\r\n<meta charset=\"utf-8\" />\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n<title>【郑州天气】郑州天气预报,蓝天,蓝天预报,雾霾,雾霾消散,天气预报一周,天气预报15天查询</title>\r\n<meta http-equiv=\"Content-Language\" content=\"zh-cn\">\r\n<meta name=\"keywords\" content=\"郑州天气预报,郑州今日天气,郑州周末天气,郑州一周天气预报,郑州蓝天,郑州蓝天预报,郑州雾霾,郑州雾霾消散,郑州40日天气预报\" />\r\n<meta name=\"description\" content=\"郑州天气预报，及时准确发布中央气象台天气信息，便捷查询郑州今日天气，郑州周末天气，郑州一周天气预报，郑州蓝天预报，郑州天气预报，郑州40日天气预报，还提供郑州的生活指数、健康指数、交通指数、旅游指数，及时发布郑州气象预警信号、各类气象资讯。\" />\r\n<meta name=\"msapplication-task\" content=\"name=天气资讯;action-uri=http://www.weather.com.cn/news/index.shtml;icon-uri=http://www.weather.com.cn/favicon.ico\" />\r\n<meta name=\"msapplication-task\" content=\"name=生活天气;action-uri=http://www.weather.com.cn/life/index.shtml;icon-uri=http://www.weather.com.cn/favicon.ico\" />\r\n<meta name=\"msapplication-task\" content=\"name=气象科普;action-uri=... <truncated>
 
 #####===== (5B) (KDD2数据探索) 檢視網頁樹 (X->XX) =====#####
 library(XML)
@@ -650,3 +464,33 @@ Rlist = c("1_500r15696","501_1000r5643","1001_1500r4830","1501_2000r4928","2001_
 ##== (D) XPATH路徑表達相對位置時，要以 "//" 開始。
 ##== (E) xpathSApply可用過濾器[]符號加上 "@"符號指定選配屬性，選擇特定屬性的元素。
 ##== (F) 在多重網頁爬取時，要以 "print()"指令顯示目前爬取的網頁。
+
+
+
+########## (Z) 數據清洗實作 ##########
+
+#####===== (Z0) 讀取數據 (ftpfile1.txt-->X) =====#####
+X = readLines("ftpfile1.txt");   length(X);   X[1:10]  # [1] 1163
+#####===== (Z1) 抓出表格首行 (X-->indB) =====#####
+indB = grep("day    oct",X);   length(indB);   indB   #-- 27  #-- 抓出字串的pattern
+#####===== (Z2) 抓出第k表格 (k-->indB[k]-->BB) =====#####
+k = 2;   indB[k]   #-- 49
+BB = X[(indB[k]+2):(indB[k]+2+30)];   BB
+########## (Z) 數據清洗實作 ##########
+
+#####===== (Z0) 讀取數據 (ftpfile1.txt-->X) =====#####
+X = readLines("ftpfile1.txt");   length(X);   X[1:10]  # [1] 1163
+
+
+i = 1
+BBi = strsplit(BB[i],split=" ")[[1]];   BBi
+BBii = BBi[which(nchar(BBi)>0)]; BBii
+BBiii = as.integer(BBii); BBii
+
+TT = NULL
+for(i in 1:31){
+  BBi = strsplit(BB[i],split=" "[[1]]); BBi
+  BBii = BBi[]
+}
+
+
