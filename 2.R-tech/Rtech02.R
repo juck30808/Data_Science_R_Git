@@ -1,7 +1,7 @@
 # Rtech02.R: 大數據實務技術 - 02: 文本數據之詞語分析 (4hr)
 # Jia-Sheng Heh (賀嘉生), 11/26/2020, revised from HUT03.R
 
-#setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data2/")
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/")
 #install.packages( c("data.table","jiebaR","stringr","text2vec","wordcloud") )
 
 
