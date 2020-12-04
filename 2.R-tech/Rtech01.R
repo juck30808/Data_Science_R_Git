@@ -1,24 +1,11 @@
 # Rtech01.R: 大數據實務技術 - 01: 數據獲取與預處理
 # Jia-Sheng Heh (賀嘉生), 11/20/2020, revised from HUT02.R
 
-setwd("c:/Users/jsheh/Desktop/working/USC/AIbda/")
-
-########## (T) 课程教材和主要参考资料 ##########
-##== 1．教材
-# (1)《R語言與大數據編程實踐》，李倩星，電子工业出版社，2017.9 (ISBN 978-7-121-32634-9)
-# (2)《數據分析與數據挖掘實用教程 (Introduction to Big Data Technology)》殷復蓮，中國傳媒大學出版社，2017.9 (ISBN 978-7-5657-2160-1)
-##== 2．参考书目
-# (1)《數據挖掘: R語言實戰》黃文,王正林，電子工業出版社, 2014.6
-
-
-########## (P) 課前準備 ##########
-##== (1) 本單元課程為數據擷取，有許多要從網絡上抓取數據，故請隨時保持網絡連線
-##== (2) 從微信群組下載 本份講義程式檔 Rtech01.R 放入本門課課程目錄，並以 RStudio開啟
-##== (3) 若見到本編程檔為中文亂碼，請以 File-->Reopen with Encoding --> UTF8，則可看到中文碼顯示
-##== (4) 修改本程式第4行，設定工作目錄為 本門課工作目錄
-##== (5) 依本課程(1B)指示，下載本門課所需之軟件包至本機備用 -- 下行安裝指令只需執行一次
-install.packages( c("RCurl","XML","rvest","xml2","curl","datesets","MASS","readxl","jsonlite") )
-##== (6) 從微信群組下載 HUT02data.zip 數據壓縮檔，解壓縮後放入 本門課工作目錄，作為本課程待用
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/")
+#install.packages( c("RCurl","XML","rvest","xml2","curl","datesets","MASS","readxl","jsonlite") )
+# (1)《R語言與大數據編程實踐》，李倩星
+# (2)《數據分析與數據挖掘實用教程 (Introduction to Big Data Technology)》殷復蓮
+# (1)《數據挖掘: R語言實戰》
 
 
 ########## (1) 數據來源 ##########

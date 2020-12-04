@@ -5,19 +5,24 @@ setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/")
 
 
 #####===== (1) (KDD1) 讀取數據(-->X) =====#####
-dt = read.csv("vgsales.csv",fileEncoding="Big5");  
+dt = read.csv("MRT.csv",fileEncoding="UTF-8");  
 dim(dt);   head(dt,2)  
 
 
 #####===== (2) (KDD2-3) 數據轉換(X-->XX) =====#####
 table(dt$Year)
-length(which(dt$Year>=2010))   #-- [1] 5416
-XX = dt[which(dt$Year>=2010),];   dim(XX)   #-- [1] 5416   11
+length(which(dt$Year>=100)) 
+XX = dt[which(dt$Year>=100),];   dim(XX) 
 #rownames(XX) = 1:dim(XX)[1]
 
 
 
 #####===== (3) (KDD4) 數據模型(XX-->XX.group) =====#####
+E.dist = dist(XX[,7:10], method="ward.D")   #聚類方式
+XX.hc = hclust(E.dist)
+plot(XX.hc, xlab="歐式距離")
+
+
 XX.hc = hclust( dist( XX[,7:10] ), method="ward.D")
 
 
