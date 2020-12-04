@@ -9,7 +9,7 @@ output:
     highlight: github
 ---
 ```{r, include=FALSE}
-wkDir = "/Users/juck30808/Google/Course/DataScience_R/USC_R/Knit/";   setwd(wkDir);
+wkDir = "/Users/juck30808/Documents/Github/USC_R_Git/1.R-data/Knit-Teamwork/";   setwd(wkDir);
 Xfile   = "Team1.csv"
 library(data.table)
 library(pander);   library(knitr);      library(kableExtra)

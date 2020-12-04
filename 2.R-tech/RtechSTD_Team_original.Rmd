@@ -1,0 +1,61 @@
+---
+title: "APP應用程式 數據分析"
+author: "Team1."
+date: "報告時間：2020/11/20"
+output: 
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: github
+---
+```{r, include=FALSE}
+wkDir = "/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/";   setwd(wkDir);
+Xfile = "googleplaystore2.csv"
+Xfile2 = "Team1.csv"
+library(data.table)
+library(pander);   library(knitr);      library(kableExtra)
+```
+
+# (1) 數據取得
+
+```{r, echo=FALSE, warning=FALSE}
+X = read.csv(Xfile,fileEncoding="UTF-8"); 
+pander(paste0(">> (1) 交易數據: ",Xfile,", 共 ",dim(X)[1],"筆紀錄\n\n")); 
+pander(">> (2) 交易數據樣貌為: "); 
+kable(head(X)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+
+
+# (2) 數據探索
+
+```{r, echo=FALSE, warning=FALSE}
+X = read.csv(Xfile,fileEncoding="UTF-8"); 
+pander(">> (2) 交易數據樣貌為: Not Yet"); 
+kable(head(X)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+
+# (2) 數據探索
+
+```{r, echo=FALSE, warning=FALSE}
+pander(">> (2) 出事了各位: "); 
+pander(
+X[which(X.group==1),c("Rating","Reviews","Installs")],
+apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, max),
+apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, min),
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, mean),2),
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, sd),2),
+)
+```
+
+# (3) (KDD4) 數據模型(XX-->XX.group) 
+
+```{r, echo=FALSE, warning=FALSE}
+
+
+X2 = read.csv(Xfile2,fileEncoding="UTF-8"); 
+pander(">> 交易數據樣貌為: "); 
+kable(head(X2)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
