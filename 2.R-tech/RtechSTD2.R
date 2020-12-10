@@ -1,7 +1,7 @@
 # RtechSTD.R: 大數據實務技術: 學生實作
 # Jia-Sheng Heh (賀嘉生), 12/03/2020
 
-setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/")
+setwd("c:/Users/jsheh/Desktop/working/USC/AIbda/Rdata學生_助教/")
 
 ########## 第二組的數據例 ##########
 
@@ -89,9 +89,6 @@ XX[which(XX.group==7),7:10]  #-- 1.7NA+1.1EU+0.2JP+0.3OT
 round(apply(XX[which(XX.group==7),7:10], 2, mean), 2)
 # NA_Sales    EU_Sales    JP_Sales Other_Sales 
 #     1.69        1.07        0.20        0.34 
-
-
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 #####===== (5) (KDD5) 數據解讀(XX.group) =====#####
 kk = 6
