@@ -9,25 +9,56 @@ output:
     highlight: github
 ---
 
-#install.packages(c("pander","kableExtra","prettydoc"))
-
-
-```{r, include=FALSE}
-library(data.table); library(pander);   library(knitr);      
-library(kableExtra); library(readxl)
-X = as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
-```
-
-# --- 原生資料展示 ---
-```{r, include=FALSE}
-pander(paste0(">> (1) APP數據(X): 共 ",dim(X)[1],"筆紀錄\n\n")); 
-pander(">> (2) Googlestore APP數據樣貌為: "); 
+# (KDD1) 原生資料展示
+```{r, echo=FALSE, warning=FALSE}
+#install.packages(c("pander","kableExtra","prettydoc")
+#https://www.rdocumentation.org/packages/kableExtra/versions/1.3.1/topics/kable_styling 語法參考資料
+library(data.table)
+library(pander);   library(knitr);      library(kableExtra)
+library(readxl)
+X =as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
+pander(paste0(">> (1) APP數據Row共 ",dim(X)[1],"筆紀錄\n\n")); 
+pander(paste0(">> (2) APP數據Col共 ",dim(X)[2],"筆紀錄\n\n")); 
+pander(">> (3) 數據樣貌為: "); 
 kable(head(X,4)) %>%
-  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+  kable_styling(c("striped", "bordered")) %>% 
+  kable_styling(full_width = F) %>% 
+  column_spec(1, bold = T)
 ```
-  
 
-##----------不要亂動以下--------------
+## (KDD2) APP基本基料探索 (X)
+```{r, echo=FALSE, warning=FALSE}
+#https://blog.gtwang.org/r/ggplot2-tutorial-basic-concept-and-qplot/ 圖形化ggplot語法參考資料
+#install.packages("ggplot2")
+library(ggplot2)
+rating_cut = table( cut(X$Rating, breaks=c(0,1,2,3,4,5)) );
+# (0,1] (1,2] (2,3] (3,4] (4,5] 
+#    16    50   284  1923  5411 
+pander(paste0(">> 資料區間[1] Rating 在 0-1 之間",rating_cut[1],"筆\n\n"));  
+pander(paste0(">> 資料區間[2] Rating 在 1-2 之間",rating_cut[2],"筆\n\n")); 
+pander(paste0(">> 資料區間[3] Rating 在 2-3 之間",rating_cut[3],"筆\n\n")); 
+pander(paste0(">> 資料區間[4] Rating 在 3-4 之間",rating_cut[4],"筆\n\n")); 
+pander(paste0(">> 資料區間[5] Rating 在 4-5 之間",rating_cut[5],"筆\n\n")); 
+pander(paste0(">> Rating 的直方分佈圖")); 
+qplot(X$Rating)
+
+```
+
+
+
+
+
+
+
+##----------不要亂動以下(原代碼）--------------
+
+## 測試用代碼
+```{r plotexample, fig.width=2, fig.height=2, fig.align='center'}
+library(ggplot2)
+ggplot(data=data.frame(x=c(1:100),y=sin(0.1*c(1:100)))) +
+geom_line(aes(x=x,y=y))
+```
+
 
 # (KDD1) 數據取得 (-->X)
 ```{r, echo=FALSE, warning=FALSE}
