@@ -1,11 +1,33 @@
 ---
-title: "Googlestore2"
-author: "Aria"
-date: "12/4/2020"
-output: html_document
+title: "Google Stroe 應用程式下載類別分析"
+author: "同意啦哪次不同意_Team1"
+#date: "Date：2020/12/10"
+output: 
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: github
 ---
 
+#install.packages(c("pander","kableExtra","prettydoc"))
 
+
+```{r, include=FALSE}
+library(data.table); library(pander);   library(knitr);      
+library(kableExtra); library(readxl)
+X = as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
+```
+
+# --- 原生資料展示 ---
+```{r, include=FALSE}
+pander(paste0(">> (1) APP數據(X): 共 ",dim(X)[1],"筆紀錄\n\n")); 
+pander(">> (2) Googlestore APP數據樣貌為: "); 
+kable(head(X,4)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+  
+
+##----------不要亂動以下--------------
 
 # (KDD1) 數據取得 (-->X)
 ```{r, echo=FALSE, warning=FALSE}

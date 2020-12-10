@@ -29,7 +29,11 @@ Rlist = c("RR1_500r6810")   #Rlist = c("RR1_500r6810","RR501_1000r6217","RR1001_
 for (k in 1:length(Rlist)) {
   print(paste0(">> reading file - ",Rlist[k],".csv..."))
   RRk = fread(paste0(Rlist[k],".csv"), encoding="UTF-8" )
-  if (k==1) { RR = RRk }   else { RR = rbind(RR,RRk) }
+  if (k==1) { 
+    RR = RRk 
+  } else { 
+      RR = rbind(RR,RRk) 
+  }
 }
 dim(RR);         #-- 6810   12
 head(RR,2)       #-- 28996 / 464636 

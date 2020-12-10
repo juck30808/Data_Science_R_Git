@@ -10,8 +10,8 @@ output:
 ---
 #install.packages(c("pander","kableExtra","prettydoc"))
 ```{r, include=FALSE}
-wkDir = "/Users/juck30808/Documents/Github/USC_R_Git/1.R-data/Knit-Teamwork/";   setwd(wkDir);
-Xfile = "googleplaystore.csv"
+wkDir = "/Users/juck30808/Documents/Github/USC_R_Git/1.R-data";   setwd(wkDir);
+Xfile = "/data/googleplaystore.csv"
 library(data.table)
 library(pander);   library(knitr);      library(kableExtra)
 ```

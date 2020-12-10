@@ -1,7 +1,7 @@
 # Rtech04.R: 大數據實務技術 - 04: 數據關連與數據挖掘
 # Jia-Sheng Heh (賀嘉生), 09/24/2020, revised from HUT06.R
 
-setwd("c:/Users/Mike/Desktop/working/USC/AIbda/")
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/dataall/")
 
 ########## (P) 課前準備 ########## 
 ##== (1) 從微信群組下載 本份講義程式檔 Rtech04.R 放入本門課課程目錄，並以 RStudio開啟

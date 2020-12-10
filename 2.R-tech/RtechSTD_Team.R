@@ -4,7 +4,7 @@
 
 #####===== (1) (KDD1) 讀取數據(-->X) =====#####
 library(readxl)
-X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore2.xlsX'))
+X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
 dim(X);   
 head(X,2)  
 
@@ -101,3 +101,44 @@ head(Gm)
 # 6   6  1294 4.219706  33331.1955  1000000.000    4.22*Rating+33331.2*Reviews+1e+06*Installs
 
 write.csv(Gm,"Team1.csv")
+
+
+
+
+#--- Rtech04 ----
+
+# install.packages( c("arules","arulesViz","igraph","data.table","jiebaR","text2vec") )    
+
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
+library(arules);library(igraph)
+data(Groceries)
+X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
+# [1] 7684   16
+# App                                            Category Rating   Reviews Size Installs Type Price Content.Rating                    Genres Last.Updated Year Month Day Current.Ver  Android.Ver
+# Photo Editor & Candy Camera & Grid & ScrapBook ART_AND_DESIGN    4.1     159  19M    10,000 Free     0       Everyone              Art & Design     7-Jan-18 2018     1   7       1.0.0 4.0.3 and up
+#                            Coloring book moana ART_AND_DESIGN    3.9     967  14M   500,000 Free     0       Everyone Art & Design;Pretend Play    15-Jan-18 2018     1  15       2.0.0 4.0.3 and up
+summary(X)
+table(table(X$Category)) 
+#table(table(X$Genres))[1:17]
+# 37   38   43   47   51   56   59   61   63   84   89   95  110  116  144  160  166  171  177  179  211  223  235  245  247  266  278  279  324  627  966 1602 
+# 1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1    1    1    1    1    1 
+#t(X[1:20,7:10])
+
+# measure 評估各個品類(Category) 在有多少有 免費/年份推出 
+#PG=table(X$Category,X$Year);   rownames(PG)=NULL;  PG  # 1-33個品項  #PG[1:10,] 
+PD=table(X$Category,X$Year);   rownames(PD)=NULL;  PD     # 1-33個品項  #PD[1:10,] 
+#以下計算只取PD值
+
+# apriori演算法大概是這樣運作的，我們必須要設定support以及confidence:
+# 支持度(support)：「規則」在資料內具有普遍性，也就是這些 A 跟 B 同時出現的機率多少。
+# 信賴度(confidence)：「規則」要有一定的信心水準，也就是當購買 A 狀態下，也會購買 B 的條件機率。
+txPD = lapply( 1:dim(PD)[1], FUN=function(k) colnames(PD)[which(PD[k,]>0)] )
+arPD = apriori( txPD[1:6], parameter=list(support=0.06, confidence=0.8), control=list(verbose=FALSE));  
+#catch 1-6 year only
+
+#lhs=>rhs 代表買左邊也會買右邊的意思，而支持度與信賴度，則分別代表了普遍性與信心水準。
+inspect(arPD[9:20,])
+
+graph.arPD = graph.edgelist( cbind(inspect(arPD)[1:50,]$lhs, inspect(arPD)[1:50,]$rhs) )
+plot(graph.arPD, edge.arrow.size=0.1, edge.curved=0.3)
+
