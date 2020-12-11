@@ -20,23 +20,21 @@ rownames(XX) = 1:dim(XX)[1]
 
 
 #####===== (3) (KDD4) 數據模型(XX-->XX.group) =====#####
-X.hc = hclust( dist( X[,c("Rating","Reviews","Installs")] ),method="ward.D")
-X.group = cutree(X.hc, k=20)
+X.hc = hclust( dist( X[,c("Rating","Reviews","Installs")] ),method="ward.D"); X.hc
+X.group = cutree(X.hc, k=20);X.group
 
-X.group[1:50]
-table(X.group)
 
 Ncls = 20  #cause k =20
 X[which(X.group==1),c("Rating","Reviews","Installs")]
-apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, max)
-apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, min)
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, max),0)
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, min),0)
 round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, mean),2)
 round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, sd),2)
 # Rating  Reviews Installs 
-# 5      6477    10000      
-# 1      1       1 
-# 4.11   145.01  4646.57 
-# 0.73   360.82  4272.84 
+# 5      6477    10000      -max
+# 1      1       1          -min
+# 4.11   145.01  4646.57    -mean
+# 0.73   360.82  4272.84    -sd
 
 X.group
 
@@ -44,22 +42,18 @@ X.group
 #####===== (4) (KDD5) 數據解讀(XX.group) =====#####
 kk = 1  #X.group(kk)
 indKK = which(X.group==kk);   indKK
-c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean))
-
-
-##== Group Means (Gmean) ==##
 Gmean = NULL
 for (kk in 1:Ncls) {
-  indKK = which(X.group==kk);   indKK
+  indKK = which(X.group==kk);
   c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean))
   Gmean = rbind(Gmean, c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean)))  
 }
-round(Gmean,2)[order(Gmean[,2],decreasing=T),][1:2,]
 
 
 ##== Group Features (Gfeature) ==##
-colnames(Gmean)
+#colnames(Gmean)
 round(Gmean[1,],2)
+
 #                  Rating  Reviews Installs 
 # 1.00  2703.00     4.11   145.01  4646.57 
 
@@ -106,9 +100,7 @@ write.csv(Gm,"Team1.csv")
 
 
 #--- Rtech04 ----
-
 # install.packages( c("arules","arulesViz","igraph","data.table","jiebaR","text2vec") )    
-
 setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
 library(arules);library(igraph)
 data(Groceries)
@@ -118,7 +110,7 @@ X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2)
 # Photo Editor & Candy Camera & Grid & ScrapBook ART_AND_DESIGN    4.1     159  19M    10,000 Free     0       Everyone              Art & Design     7-Jan-18 2018     1   7       1.0.0 4.0.3 and up
 #                            Coloring book moana ART_AND_DESIGN    3.9     967  14M   500,000 Free     0       Everyone Art & Design;Pretend Play    15-Jan-18 2018     1  15       2.0.0 4.0.3 and up
 summary(X)
-table(table(X$Category)) 
+table(X$Category)
 #table(table(X$Genres))[1:17]
 # 37   38   43   47   51   56   59   61   63   84   89   95  110  116  144  160  166  171  177  179  211  223  235  245  247  266  278  279  324  627  966 1602 
 # 1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1    1    1    1    1    1 
