@@ -1,209 +1,145 @@
-# RtechSTD.R: 大數據實務技術: 學生實作
-# Team1  12/04/2020
+# Rtech06.R: 大數據實務技術 - 06: 決策樹分類、與神經網絡學習與其他模型
+# Jia-Sheng Heh (賀嘉生), 12/16/2020, revised from HUT08.R
+
+setwd("c:/Users/jsheh/Desktop/working/USC/AIbda/")
+
+########## (P) 課前準備 ########## 
+##== (1) 從微信群組下載 本份講義程式檔 Rtech06.R 放入本門課課程目錄，並以 RStudio開啟
+##== (2) 若見到本編程檔為中文亂碼，請以 File-->Reopen with Encoding --> UTF8，則可看到中文碼顯示
+##== (3) 修改本程式第4行，設定工作目錄為 本門課工作目錄
+##== (4) 下載本門課所需之軟件包至本機備用 -- 下行安裝指令只需執行一次
+# install.packages( c("tree","rpart","rpart.plot","adabag","randomForest","nnet","devtools","neuralnet","e1071","klaR","mle2") )    
+##== (5) 從微信群組下載 RR1_500r6810.csv, RR501_1000r6217.csv, RR1001_1500r7707.csv, 
+#                       RR"1501_2000r8262.csv 數據檔，放入 本門課工作目錄，作為本課程待用
 
 
-#####===== (1) (KDD1) 讀取數據(-->X) =====#####
-library(readxl)
-X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
-dim(X);   
-head(X,2)  
+########## (1) 分類的基本概念 [殷,7.1] ##########
 
+#####=====*(1A) (HUT06-1B,HUB07-1B) 數據模型(Data Model)符號 =====#####
+##== 系統/模型/函數(System/Model/Function, M):  因變量/輸出數據y = M( 自變量/輸入數據u )  
+#    -- (1) 訓練階段(Training/Learning/Modeling/Estimation Phase): (u, y) -> M
+#             由輸入/輸出 u與y，求取(估測estimate)模型M#
+#    -- (2) 應用階段(Prediction/Estimation/Production/Application Phase): (u_new, M#) -> y_predict
+#             以所估測的模型M#與新的輸入 u_new，求取(估測)新的輸出 y_predict
+##== 機器學習(Machine Learning)
+#    -- (1) 監督式學習 (Supervised learning): 具範例(u,y), y為教師(teacher, desired output) y, 以求得y=M(u)
+#           (1A)迴歸(regression):     y 為連續數據   --> 上一單元HUT07
+#           (1B)分類(classification): y 為離散數據   --> 本單元  HUT08   
+#    -- (2) 無監督式學習 (Unsupervised learning): 無輸出y, 目標在於發掘輸入(u)的隱含特徵 --> 數據挖掘(Data Mining)
+#           (2A)聚類(clustering):           計算數據u的相似度，以產生其分類。 --> HUT05單元
+#           (2B)關聯規則(association rule): 計算多數據(ui-uj)間的關連。       --> HUT06單元
+#           (2C)數據序列(data sequencing):  計算多數據(ui-uj)間的時序關係。   --> 未列入本課程
 
-#####===== (2) (KDD2-3) 數據轉換(X-->XX) =====#####
-range(X$Rating) 
-table( cut(X$Rating, breaks=c(0,1,2,3,4,5)) )
+#####===== (1B) 數據分割的方法 =====#####
+# python 機器學習劃分訓練集/測試集/驗證集, 2019/01/14, https://www.itread01.com/content/1547463484.html
+##== 常用的數據分割有不同的比例，均應代表原來的數據
+#    -- (1) 留出法(hold-out): 抽取80%的數據用以建構模式, 剩下的20%用於模式的效度檢驗 train_test_split
+#    -- (2) k-fold交互驗證(k-fold cross-validation): KFold, GroupKFild, StratifiedKFold 
+#           -- 將數據分為 k 個等分，每次選取 k-1 份進行模式訓練，剩下的一份數據則用以測試模式。
+#           -- 如此重複 k 次，使每筆數據都能成為訓練數據集與測試數據集，最後的平均結果代表模式的效度。
+#    -- (3) leave-one-out cross-validation: 當k個區間等於總樣本數時: LeaveOneGroupOut，LeavePGroupsOut，LeaveOneOut，LeavePOut
+#    -- (4) 自助法(bootstraping): 使用重複取樣的方式進行數據取樣: 自定函式
+##== 留出法函式: 數據直接取樣函式(X/y_train)及測試數據(X/y_test)
+#    -- (1)留出法（hold-out）-- 隨機抽樣
+#          -- 將數據集 X 劃分為 訓練集X_train 及 測試集 X_test
+#          -- 通常以 2/3~4/5 的數據用於訓練，test_size 預設值為 0.25
+#          -- 亦可設定 test_size 為測試數量，另亦可設定訓練數據 train_size
+#    -- (2) 留出法（hold-out）-- 分層抽樣
 
-range(X$Year)   #2010 - 2018
-table(X$Year)
-XX = X[which(X$Year>=2018),];   dim(XX)
-rownames(XX) = 1:dim(XX)[1] #設定row名稱
-XX
-
-#####===== (3) (KDD4) 數據模型(XX-->XX.group) =====#####
-#算距離#ward d離差平方和
-X.hc = hclust( dist( X[,c("Rating","Reviews","Installs")] ),method="ward.D"); X.hc #dist(,method=)認定distance的使用方法
-head(X.hc,2)
-#分群
-X.group = cutree(X.hc, k=20);X.group
-table(X.group)
-
-Ncls = 20  #cause k =20
-X[which(X.group==1),c("Rating","Reviews","Installs")]
-round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, max),0)
-round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, min),0)
-round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, mean),2)
-round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, sd),2)
-# Rating  Reviews Installs 
-# 5      6477    10000      -max
-# 1      1       1          -min
-# 4.11   145.01  4646.57    -mean
-# 0.73   360.82  4272.84    -sd
-
-X.group
-
-
-#####===== (4) (KDD5) 數據解讀(XX.group) =====#####
-kk = 1  #X.group(kk)
-indKK = which(X.group==kk);   indKK
-c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean))
-
-
-##== Group Means (Gmean) ==##
-Gmean = NULL
-for (kk in 1:Ncls) {
-  indKK = which(X.group==kk);   indKK
-  c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean))
-  Gmean = rbind(Gmean, c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean)))  
+#####===== (1C) (HUT05:1C-1D,HUT07-3A) iris 數據 =====#####
+dim(iris);   head(iris,2)
+#   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+# 1          5.1         3.5          1.4         0.2  setosa
+# 2          4.9         3.0          1.4         0.2  setosa
+##== 數據的筆數為150筆，共有五個欄位(前四個單位為公分)：
+#--     花萼長度(Sepal Length),花萼寬度(Sepal Width),花瓣長度(Petal Length),花瓣寬度(Petal Width),
+#--     類別(Class)：三個品種Setosa，Versicolor和Virginica
+attach(iris)   ##== (1) 設定數據框為iris, 可以精簡以下的變量表示
+##== 鳶尾花類別分布圖
+plot.iris <- function(xx,yy,xxlab,yylab) {
+  plot(NULL,xlim=range(xx),ylim=range(yy),main="classified scatter plot of iris data",xlab=xxlab,ylab=yylab)
+  points(xx[Species=="setosa"],yy[Species=="setosa"],pch=1,col="blue")
+  points(xx[Species=="virginica"],yy[Species== "virginica"],pch=2,col="green")
+  points(xx[Species=="versicolor"],yy[Species== "versicolor"],pch=3,col="purple")
+  legend("topleft",legend=c("setosa","virginica","versicolor"), bty="n",col=c("blue","green","purple"),x.intersp=0.5, y.intersp=0.5,pch=c(1,2,3))
 }
-round(Gmean,2)[order(Gmean[,2],decreasing=T),][1:2,]
+plot.iris(Petal.Width, Petal.Length, "Petal.Width", "Petal.Length")
+
+#####===== (1D) 主要的分類模型 [殷,7.1] =====#####
+##== 決策樹分類: ID3, C4.5, Cart算法 [殷,7.2, 7.9.1-7.9.2]          --> (2)-(3)
+##== kNN (k最近鄰)分類 [殷,7.3, 7.9.3]: 是[HUT05]聚類的衍生,訓練/預測時調用 knn3()/predict(), 本單元略過
+##== 貝葉斯分類: 最樸素貝葉斯和貝葉斯信念網絡分類法 [殷,7.4, 7.9.4] --> (5A)
+##== 人工神經網絡: 無監督學習網絡和有監督學習網絡 [殷,7.5, 7.9.5]   --> (4A-4C)
+##== 支持向量機: 線性SVM分類 [殷,7.6, 7.9.6]                        --> (4D)
+##== 組合方法 [殷,7.7, 7.9.7]                                       --> (3B)
+##== 其他方法
 
 
-##== Group Features (Gfeature) ==##
-colnames(Gmean)
-round(Gmean[1,],2)
-#                  Rating  Reviews Installs 
-# 1.00  2703.00     4.11   145.01  4646.57 
+########## (2) 決策樹分類的基本操作 [殷,7.2, 7.9.2] ##########
 
-##-- 希望得到: 
-##-- 4.11 * Rating 
-##-- + 145.01 * Reviews
-##-- + 4646.57 * Installs
-
-AA = paste0(round(Gmean[1,3:5],2), " * ", colnames(Gmean)[3:5]);  AA
-BB = paste( AA, collapse=" + ");   BB
-# "4.1 * Rating + 145 * Reviews + 4646.6 * Installs"
-
-
-#####===== (5) (KDD5) 數據解讀(XX.group) =====#####
-
-##==> 用迴圈包成Gfeature
-Gfeature = NULL
-for (k in 1:dim(Gmean)[1]) {
-  print(k)
-  AA = paste0(round(Gmean[k,3:5],2), " * ", colnames(Gmean)[3:5]);  AA
-  BB = paste( AA, collapse="+")
-  print(BB)
-  Gfeature[k] = BB
-}
-Gfeature
-
-##==> 把Gmean,Gfeature合成數據框
-Gm = as.data.frame(Gmean);  head(Gm)
-colnames(Gm)[1:2] = c("ind","count");   head(Gm)
-Gm$feature = Gfeature
-head(Gm)
-#   ind count   Rating     Reviews     Installs                                       feature
-# 1   1  2703 4.114058    145.0067     4646.566   4.11*Rating+145.01*Reviews+4646.57*Installs
-# 2   2   487 4.166530   9483.6181   500000.000    4.17*Rating+9483.62*Reviews+5e+05*Installs
-# 3   3   525 4.248952 106100.6076  5000000.000  4.25*Rating+106100.61*Reviews+5e+06*Installs
-# 4   4   115 4.306957 889797.8348 50000000.000  4.31*Rating+889797.83*Reviews+5e+07*Installs
-# 5   5  1463 4.087697   2570.0615    85201.640 4.09*Rating+2570.06*Reviews+85201.64*Installs
-# 6   6  1294 4.219706  33331.1955  1000000.000    4.22*Rating+33331.2*Reviews+1e+06*Installs
-write.csv(Gm,"Team1.csv")
-
-
-#--- Rtech04 ----
-# install.packages( c("arules","arulesViz","igraph","data.table","jiebaR","text2vec") )    
-setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
-library(arules);library(igraph)
-#data(Groceries)
-#X = read.csv("googleplaystore4.csv");   dim(X);   head(X,2) 
-# [1] 7684   16
-# App                                            Category Rating   Reviews Size Installs Type Price Content.Rating                    Genres Last.Updated Year Month Day Current.Ver  Android.Ver
-# Photo Editor & Candy Camera & Grid & ScrapBook ART_AND_DESIGN    4.1     159  19M    10,000 Free     0       Everyone              Art & Design     7-Jan-18 2018     1   7       1.0.0 4.0.3 and up
-#                            Coloring book moana ART_AND_DESIGN    3.9     967  14M   500,000 Free     0       Everyone Art & Design;Pretend Play    15-Jan-18 2018     1  15       2.0.0 4.0.3 and up
-summary(X)
-#table(table(X$Category)) 
-#table(table(X$Genres))[1:17]
-# 37   38   43   47   51   56   59   61   63   84   89   95  110  116  144  160  166  171  177  179  211  223  235  245  247  266  278  279  324  627  966 1602 
-# 1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1    1    1    1    1    1 
-t(X[1:20,7:10]) #[橫：直]
-
-# measure 評估各個品類(Category) 在有多少有 免費/年份推出 
-#PG=table(X$Category,X$Year);   rownames(PG)=NULL;  PG  # 1-33個品項  #PG[1:10,] 
-PD=table(X$Category,X$Year);   rownames(PD)=NULL;  PD     # 1-33個品項  #PD[1:10,] 
-#以下計算只取PD值
-
-# apriori演算法大概是這樣運作的，我們必須要設定support以及confidence:
-# 支持度(support)：「規則」在資料內具有普遍性，也就是這些 A 跟 B 同時出現的機率多少。
-# 信賴度(confidence)：「規則」要有一定的信心水準，也就是當購買 A 狀態下，也會購買 B 的條件機率。
-FUN=function(k) colnames(PD)[which(PD[k,]>0)]
-txPD = lapply( 1:dim(PD)[1], FUN=function(k) colnames(PD)[which(PD[k,]>0)] )
-#取出有代表性資料
-arPD = apriori( txPD[1:6], parameter=list(support=0.06, confidence=0.8), control=list(verbose=FALSE));  
-#catch 1-6 year only
-
-#lhs=>rhs 代表買左邊也會買右邊的意思，而支持度與信賴度，則分別代表了普遍性與信心水準。
-inspect(arPD[9:20,]) #第9之前有空集合 
-graph.arPD = graph.edgelist( cbind(inspect(arPD)[1:50,]$lhs, inspect(arPD)[1:50,]$rhs) )
-plot(graph.arPD, edge.arrow.size=0.1, edge.curved=0.3)
-
-
-
-#=========R-tech6================
-setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
-#X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
-X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
-##== App 收費 type 分布圖 
-dim(X); head(X,2)
-attach(X)   ##== (1) 設定數據框為X, 可以精簡以下的變量表示
-plot.app <- function(xx,yy,xxlab,yylab) {
-  plot(NULL,xlim=range(xx),ylim=range(yy),
-       main="classified scatter plot of iris data",
-       xlab=xxlab,ylab=yylab)
-  points(xx[Type=="Free"],yy[Type=="Free"],pch=1,col="blue")
-  points(xx[Type=="Paid"],yy[Type== "Paid"],pch=2,col="red")
-  legend("topleft",
-         legend=c("Free","Paid"), bty="n",
-         col=c("blue","red"),
-         x.intersp=0.5, y.intersp=0.5,
-         pch=c(1,2))
-}
-Reviews.log =log10(Reviews)
-Rating.log = log10(Rating)
-plot.app(Rating,Reviews.log, "Rating", "Reviews")  #收費不一定比較好
+#####===== (2A) 決策樹(decision tree)基本概念 =====#####
+##== 決策樹: 由結節和有向邊組成的層次結構:
+#    -- 樹狀結構, 包括(1)(待分類的)決策結點, (2)(可能分類結困的)葉結點或終結點, (3)(不同決策取值的)分支
+#    -- 三種數據屬性: (1)標稱屬性(single,married,divorced), (2)序列屬性(e.g.Hot,Mild,Cool), (3)連續屬性(e.g.Petal.Width)
+#    -- 兩種數據分裂(split): (1)二元劃分, (2)多路劃分
+##== 三種數據不純度(impurity)度量: (1)Gini, (2)熵/亂度(Entropy), (3)分類誤差(Error) [請參見(3A)]
+##== 三種常見決策樹算法
+#    -- ID3: 利用增益率, 採用二叉樹 -- 演法偽代碼 [殷,7.2, p.176]
+#    -- C4.5: ID3改進版, 採用多重分支和剪枝技術 -- 演法偽代碼 [殷,7.2, pp.181-182]
+#    -- CART: 利用Gini係數，採用二元遞歸劃分方法 -- 演法偽代碼 [殷,7.2, p.188]
+#       [分類迴歸樹(CART, Classification And Regression Tree), Breiman (1984)]
+##== R中常見的決策樹軟件包 (不同的演算法，預測的正確率亦不同) 
+#    -- party: 利用C4.5, 但因要安裝 rJava與RWeka，本教材中不講義，請參考課本 [殷,7.9.1]
+#    -- tree: 使用CART，在下一子節(2B)講解 [殷,7.9.2]
+#    -- rpart: 可自定Gini和Entropy，最普遍，網絡上案例最多
 
 #####=====*(2B) iris例說明決策樹tree操作程序及其中觀念 [殷,7.2, 7.9.2] =====#####
-library(tree);library(rpart)
-#因變數   #自變數  #資料源
-iris.tree = tree(Type ~ Rating + Reviews, data=X[c(1:10,170:220),]);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
-
-X$Reviews.log =log10(X$Reviews)
-XX = as.data.frame(X[c(1:10,170:220),c("Rating","Reviews.log","Type")]);   dim(XX);   head(XX,2)
-# iris.tree = tree(Type ~ Rating + Reviews.log, data=XX);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
-# iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX);    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX, 
-                   control=rpart.control(minsplit=6, maxdepth=4));    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-
-
-
+library(tree)
+##== 模型的訓練階段: 由輸入數據(u)輸出數據(y) 求取模型 M = tree(y~u) 
+iris.tree = tree(Species ~ .,data=iris);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
+# 1) root 150 329.600 setosa ( 0.33333 0.33333 0.33333 )  
+#   2) Petal.Length < 2.45 50   0.000 setosa ( 1.00000 0.00000 0.00000 ) * 葉結點 R2 
+#   3) Petal.Length > 2.45 100 138.600 versicolor ( 0.00000 0.50000 0.50000 )        
+#     6) Petal.Width < 1.75 54  33.320 versicolor ( 0.00000 0.90741 0.09259 )  
+#      12) Petal.Length < 4.95 48   9.721 versicolor ( 0.00000 0.97917 0.02083 )  
+#        24) Sepal.Length < 5.15 5   5.004 versicolor ( 0.00000 0.80000 0.20000 ) * 葉結點 FR24
+#        25) Sepal.Length > 5.15 43   0.000 versicolor ( 0.00000 1.00000 0.00000 ) * 葉結點 R25
+#      13) Petal.Length > 4.95 6   7.638 virginica ( 0.00000 0.33333 0.66667 ) * 葉結點 FR13
+#     7) Petal.Width > 1.75 46   9.635 virginica ( 0.00000 0.02174 0.97826 )  
+#      14) Petal.Length < 4.95 6   5.407 virginica ( 0.00000 0.16667 0.83333 ) * 葉結點 FR14
+#      15) Petal.Length > 4.95 40   0.000 virginica ( 0.00000 0.00000 1.00000 ) * 葉結點 R15
 ##== 繪製決策樹
 plot(iris.tree);     text(iris.tree)  #-- 6個葉結點, 其餘均為決策結點, 數據分裂為二元劃分
-Species.new.tree3 = predict(iris.tree, newdata=X,level=0.95,interval="confidence")
-plot.app(Rating.log,Reviews.log, "Rating", "Reviews")
-
-abline(h=2.45,col="purple");  
-segments(1.75,2.45,1.75,7,col="pink");  
-segments(0,4.95,1.75,4.95,col="red");
-
-Species.new.tree = apply(Species.new.tree3, 1, which.max); 
-Species.new.tree[41:60] 
-
-#-- 將150*3的陣列 轉成 150*1 的向量
+##== 從決策樹到AI的規則庫(rulebase)
+#    -- node 2 ---> R2:  IF (Petal.Length<2.45) THEN Species=setosa
+#    -- node 25---> R25: IF (Petal.Length>2.45)&(Petal.Width<1.75)&(Petal.Length<4.95)&(Sepal.Length>5.15) 
+#                                               THEN Species=versicolor
+#    -- node 15---> R15: IF (Petal.Length>4.95)&(Petal.Width<1.75) THEN Species=virginica
+#    -- nodes FR24,FR13,FR14 為未確定規則(uncertain rules,為粗糙集rough set中的定義)，如:
+#                  FR13: IF (Petal.Length>4.95)&(Petal.Width>1.75) THEN Species=virginica (prob=0.66667)
+##== 模型的預測階段: 由所求取的模型(M),對新的數據(u_new)進行輸出結果預測 y_predict = predict(M,u_new)
+Species.new.tree3 = predict(iris.tree, newdata=iris,level=0.95,interval="confidence")
+##== iris圖上的決策屬性分割: iris--iris.tree
+plot.iris(Petal.Width, Petal.Length, "Petal.Width", "Petal.Length")
+abline(h=2.45,col="purple");  segments(1.75,2.45,1.75,7,col="pink");  segments(0,4.95,1.75,4.95,col="red");
+#    -- 可以看出，每一個決策結點，為一個直角分割(rectangular partition), 如:
+#       -- 決策結點 2與3 的分支是由圖上的 紫色橫線(Petal.Length=2.45) 來進行數據分裂
+#       -- 決策結點 6與7 的分支是由圖上的 粉色直線(Petal.Width=1.75) 來進行數據分裂
+#       -- 決策結點14與15的分支是由圖上的 紅色橫線(Petal.Length=4.95) 來進行數據分裂
+##== 混淆矩陣(confusion matrix): 比較 原輸出結果 與 預測輸出結果 的差別
+Species.new.tree = apply(Species.new.tree3, 1, which.max); Species.new.tree[41:60] #-- 將150*3的陣列 轉成 150*1 的向量
 # 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 
 #  1  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2  2 
-table(Species.new.tree, Species)
+table( Species.new.tree, Species)
 #                  Species
 # Species.new.tree setosa versicolor virginica
 #                1     50          0         0
 #                2      0         47         1
-#                3      0          3        49'
+#                3      0          3        49
 
-
-##== 訓練模型
+#####===== (2C) iris例說明決策樹rpart操作程序 =====#####
 library(rpart);   library(rpart.plot)
+##== 訓練模型
 iris.rpart = rpart(Species ~. , data=iris);   print(iris.rpart)
 # 1) root 150 100 setosa (0.33333333 0.33333333 0.33333333)  
 #   2) Petal.Length< 2.45 50   0 setosa (1.00000000 0.00000000 0.00000000) *
@@ -245,7 +181,7 @@ y_predict = as.integer(Species.new.rpart);  y_predict[91:110]  #-- [1] 2 2 2 2 2
 ##== 數據間的距離
 dist( rbind(y_actual,y_predict) )   #-- = 2: euclidean distance (歐式距離,預設)
 dist( rbind(y_actual,y_predict), method="manhattan" )   #-- = 4: manhattan distance (曼哈頓/直角距離)
-#-- method 可以是 "euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski"
+  #-- method 可以是 "euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski"
 ##== 混淆矩陣(confusion matrix)
 #--  -- 多分類混淆矩陣
 table(y_actual, y_predict)
@@ -306,11 +242,11 @@ bank$debt = as.factor(bank$debt);        bank   #-- 必須轉為 factor, 決策�
 #--      -- (1b) Gini係數的函式定義 [殷,7.2]
 Gini <- function(tblX) { g1=1-sum((tblX^2)/sum(tblX)^2); return(g1)};  Gini(table(bank$debt))  #-- [1] 0.42 [殷7-55]
 Gini2 <- function(X,A,a1,a2) {  AX = table( (A %in% a1), X );   AX
-#       no yes
-# FALSE  2   2
-# TRUE   5   1
-g2 = sum(apply(AX,1,Gini)*rowSums(AX)/sum(AX));   g2   #-- [1] 0.3666667
-return(g2)  
+  #       no yes
+  # FALSE  2   2
+  # TRUE   5   1
+  g2 = sum(apply(AX,1,Gini)*rowSums(AX)/sum(AX));   g2   #-- [1] 0.3666667
+  return(g2)  
 }
 #--      -- (1c) Gini係數的計算 [殷,pp.187-190]
 Gini(table(bank$debt)) - Gini2(bank$debt, bank$house, c("yes"), c("no"))   #-- [1] 0.07714286 [殷7-57]
@@ -340,11 +276,11 @@ weather = read.csv("weather.csv");   dim(weather);   weather   #-- [1] 14  6
 #--      -- (2b) 熵/亂度(entropy)的函式定義 [殷,7.2]
 Entropy <- function(tblX) return(sum(-log(tblX/sum(tblX),base=2)*(tblX/sum(tblX)),na.rm=T));   Entropy(table(weather$playball))   #-- [1] 0.940286 [殷7-12]
 Entropy2 <- function(X,A) {  AX = table( A, X );   AX
-#        No Yes
-# Strong  3   3
-# Weak    2   6
-g2 = sum(apply(AX,1,Entropy)*rowSums(AX)/sum(AX));   g2   #-- [1] 0.3666667
-return(g2)  
+  #        No Yes
+  # Strong  3   3
+  # Weak    2   6
+  g2 = sum(apply(AX,1,Entropy)*rowSums(AX)/sum(AX));   g2   #-- [1] 0.3666667
+  return(g2)  
 }
 #--      -- (2c) 熵/亂度(entropy)的計算 [殷,p.172]
 Entropy(table(weather$playball)) - Entropy2(weather$playball, weather$wind)        #-- [1] 0.04812703 [殷7-16,7-20]
@@ -700,63 +636,3 @@ table(round(y_predict,0), iris$Species)
 ##== (RVD) 一個神經元相當於一個 "超平面(hyperplane)"，將數據空間分割為正/負兩個半平面。
 ##== (RVE) 在素樸貝葉斯分類法中，會計算數據在每個類中的P(Ci)*P(X|Ci)，這是一種 "後驗概率(a posteriori probability)"。
 ##== (RVF) 不論是監督式或無監督式模型，都是大數據分析中的第四步驟 "數據模型(data modeling)"。
-
-
-
-#=========R-tech5================
-
-
-XX = X[,c("Price","Rating")]
-cor(XX)   #-- correlation
-XX.lm = lm(Price~Rating,data=XX);   XX.lm
-
-plot(XX)
-abline(XX.lm)
-
-XX = as.data.frame(X);  
-XX$ym = substr(XX$'Last Updated',1,7)
-XX$date = as.Date(X$`Last Updated`)
-XX$dd   = as.integer(XX$date - min(XX$date))
-XX$mm   = as.integer(XX$dd / 30 ) + 1
-head(XX,2)
-
-TMC0 = round((table(XX$Category) > 0),1)
-dim(TMC0)
-TMC = TMC0[1:52]
-dim(TMC)
-txTMC = lapply( 1:dim(TMC), FUN=function(k) colnames(TMC)[which(TMC[k,]>0)] )
-arTMC = apriori( txTMC, parameter=list(support=0.3, confidence=0.6), control=list(verbose=FALSE) )
-inspect(arTMC)
-
-XXX = XX[,c("mm","Installs")]
-library(data.table)
-setDT(XX,key=c("mm"))
-maxXX = XX[, .(maxInstalls=max(Installs)), by=mm]
-plot(maxXX)          
-
-###
-dim(X);   head(X,3)
-plot(Rating ~ Installs, data = X)
-
-XX = X[,c("Year","Installs")]
-cor(XX)
-
-X.lm = lm(Installs ~ Reviews, data = X)  #--> linear model lm() 即為線性回歸的模型 M()
-X.lm
-
-w = coef(X.lm);  w #拮据
-# (Intercept)       speed  --> 表示線性回歸式為   y =     w0      +       w1 * u  
-#  -17.579095    3.932409                      dist = (-17.579095) + (3.932409) * speed
-plot(Installs ~ Reviews, data = X)
-abline(coef(X.lm))
-
-u = X$Reviews;   mean(u)   
-y = X$Installs;    mean(y)   
-w1 = sum((u-mean(u))*(y-mean(y)))/sum((u-mean(u))^2) ;   w1   #-- = 5387.4/1370 = 3.932409
-w0 = mean(y) - w1 * mean(u);   w0
-
-X1 = data.frame(Reviews=c(100,1000,1e+07,2e+07))
-##== 預測函式(predict())
-X1$install = predict(X.lm, newdata=X1)  
-X1
-

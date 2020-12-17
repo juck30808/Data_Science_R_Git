@@ -142,8 +142,8 @@ plot(graph.arPD, edge.arrow.size=0.1, edge.curved=0.3)
 
 #=========R-tech6================
 setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
-#X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
-X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
+X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
+
 ##== App 收費 type 分布圖 
 dim(X); head(X,2)
 attach(X)   ##== (1) 設定數據框為X, 可以精簡以下的變量表示
@@ -163,21 +163,13 @@ Reviews.log =log10(Reviews)
 Rating.log = log10(Rating)
 plot.app(Rating,Reviews.log, "Rating", "Reviews")  #收費不一定比較好
 
+
+
+
 #####=====*(2B) iris例說明決策樹tree操作程序及其中觀念 [殷,7.2, 7.9.2] =====#####
-library(tree);library(rpart)
-#因變數   #自變數  #資料源
-iris.tree = tree(Type ~ Rating + Reviews, data=X[c(1:10,170:220),]);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
-
-X$Reviews.log =log10(X$Reviews)
-XX = as.data.frame(X[c(1:10,170:220),c("Rating","Reviews.log","Type")]);   dim(XX);   head(XX,2)
-# iris.tree = tree(Type ~ Rating + Reviews.log, data=XX);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
-# iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX);    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX, 
-                   control=rpart.control(minsplit=6, maxdepth=4));    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-
-
+library(tree)
+                 #因變數   #自變數  #資料源
+iris.tree = tree(Rating ~ Reviews,data=X);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
 
 ##== 繪製決策樹
 plot(iris.tree);     text(iris.tree)  #-- 6個葉結點, 其餘均為決策結點, 數據分裂為二元劃分

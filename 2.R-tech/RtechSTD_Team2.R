@@ -1,73 +1,172 @@
-# Rtech05.R: 大數據實務技術 - 05: 監督式學習與數據回歸
-# Jia-Sheng Heh (賀嘉生), 12/11/2020, revised from HUT07.R
+# RtechSTD.R: 大數據實務技術: 學生實作
+# Team1  12/04/2020
+
+
+#####===== (1) (KDD1) 讀取數據(-->X) =====#####
+library(readxl)
+X <- as.data.frame(read_excel('/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data/googleplaystore4_(7000).xlsX'))
+dim(X);   
+head(X,2)  
+
+
+#####===== (2) (KDD2-3) 數據轉換(X-->XX) =====#####
+range(X$Rating) 
+table( cut(X$Rating, breaks=c(0,1,2,3,4,5)) )
+
+range(X$Year)   #2010 - 2018
+table(X$Year)
+XX = X[which(X$Year>=2018),];   dim(XX)
+rownames(XX) = 1:dim(XX)[1]
+
+
+#####===== (3) (KDD4) 數據模型(XX-->XX.group) =====#####
+X.hc = hclust( dist( X[,c("Rating","Reviews","Installs")] ),method="ward.D"); X.hc
+X.group = cutree(X.hc, k=20);X.group
+
+
+Ncls = 20  #cause k =20
+X[which(X.group==1),c("Rating","Reviews","Installs")]
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, max),0)
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, min),0)
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, mean),2)
+round(apply(X[which(X.group==1),c("Rating","Reviews","Installs")], 2, sd),2)
+# Rating  Reviews Installs 
+# 5      6477    10000      -max
+# 1      1       1          -min
+# 4.11   145.01  4646.57    -mean
+# 0.73   360.82  4272.84    -sd
+X.group
+
+
+#####===== (4) (KDD5) 數據解讀(XX.group) =====#####
+kk = 1  #X.group(kk)
+indKK = which(X.group==kk);   indKK
+Gmean = NULL
+for (kk in 1:Ncls) {
+  indKK = which(X.group==kk);
+  c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean))
+  Gmean = rbind(Gmean, c(kk,length(indKK), apply(X[indKK,c("Rating","Reviews","Installs")], 2, mean)))  
+}
+
+
+##== Group Features (Gfeature) ==##
+#colnames(Gmean)
+round(Gmean[1,],2)
+#                  Rating  Reviews Installs 
+# 1.00  2703.00     4.11   145.01  4646.57 
+
+##-- 希望得到: 
+##-- 4.11 * Rating 
+##-- + 145.01 * Reviews
+##-- + 4646.57 * Installs
+
+AA = paste0(round(Gmean[1,3:5],2), " * ", colnames(Gmean)[3:5]);  AA
+BB = paste( AA, collapse=" + ");   BB
+# "4.1 * Rating + 145 * Reviews + 4646.6 * Installs"
+
+
+#####===== (5) (KDD5) 數據解讀(XX.group) =====#####
+
+##==> 用迴圈包成Gfeature
+Gfeature = NULL
+for (k in 1:dim(Gmean)[1]) {
+  print(k)
+  AA = paste0(round(Gmean[k,3:5],2), " * ", colnames(Gmean)[3:5]);  AA
+  BB = paste( AA, collapse="+")
+  print(BB)
+  Gfeature[k] = BB
+}
+Gfeature
+
+##==> 把Gmean,Gfeature合成數據框
+Gm = as.data.frame(Gmean);  head(Gm)
+colnames(Gm)[1:2] = c("ind","count");   head(Gm)
+Gm$feature = Gfeature
+head(Gm)
+#   ind count   Rating     Reviews     Installs                                       feature
+# 1   1  2703 4.114058    145.0067     4646.566   4.11*Rating+145.01*Reviews+4646.57*Installs
+# 2   2   487 4.166530   9483.6181   500000.000    4.17*Rating+9483.62*Reviews+5e+05*Installs
+# 3   3   525 4.248952 106100.6076  5000000.000  4.25*Rating+106100.61*Reviews+5e+06*Installs
+# 4   4   115 4.306957 889797.8348 50000000.000  4.31*Rating+889797.83*Reviews+5e+07*Installs
+# 5   5  1463 4.087697   2570.0615    85201.640 4.09*Rating+2570.06*Reviews+85201.64*Installs
+# 6   6  1294 4.219706  33331.1955  1000000.000    4.22*Rating+33331.2*Reviews+1e+06*Installs
+write.csv(Gm,"Team1.csv")
+
+
+#--- Rtech04 ----
+# install.packages( c("arules","arulesViz","igraph","data.table","jiebaR","text2vec") )    
 setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
+library(arules);library(igraph)
+data(Groceries)
+X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
+# [1] 7684   16
+# App                                            Category Rating   Reviews Size Installs Type Price Content.Rating                    Genres Last.Updated Year Month Day Current.Ver  Android.Ver
+# Photo Editor & Candy Camera & Grid & ScrapBook ART_AND_DESIGN    4.1     159  19M    10,000 Free     0       Everyone              Art & Design     7-Jan-18 2018     1   7       1.0.0 4.0.3 and up
+#                            Coloring book moana ART_AND_DESIGN    3.9     967  14M   500,000 Free     0       Everyone Art & Design;Pretend Play    15-Jan-18 2018     1  15       2.0.0 4.0.3 and up
+summary(X)
+table(X$Category)
+#table(table(X$Genres))[1:17]
+# 37   38   43   47   51   56   59   61   63   84   89   95  110  116  144  160  166  171  177  179  211  223  235  245  247  266  278  279  324  627  966 1602 
+# 1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1    1    1    1    1    1 
+#t(X[1:20,7:10])
+
+# measure 評估各個品類(Category) 在有多少有 免費/年份推出 
+#PG=table(X$Category,X$Year);   rownames(PG)=NULL;  PG  # 1-33個品項  #PG[1:10,] 
+PD=table(X$Category,X$Year);   rownames(PD)=NULL;  PD     # 1-33個品項  #PD[1:10,] 
+#以下計算只取PD值
+
+# apriori演算法大概是這樣運作的，我們必須要設定support以及confidence:
+# 支持度(support)：「規則」在資料內具有普遍性，也就是這些 A 跟 B 同時出現的機率多少。
+# 信賴度(confidence)：「規則」要有一定的信心水準，也就是當購買 A 狀態下，也會購買 B 的條件機率。
+txPD = lapply( 1:dim(PD)[1], FUN=function(k) colnames(PD)[which(PD[k,]>0)] )
+arPD = apriori( txPD[1:6], parameter=list(support=0.06, confidence=0.8), control=list(verbose=FALSE));  
+#catch 1-6 year only
+
+#lhs=>rhs 代表買左邊也會買右邊的意思，而支持度與信賴度，則分別代表了普遍性與信心水準。
+inspect(arPD[9:20,])
+
+graph.arPD = graph.edgelist( cbind(inspect(arPD)[1:50,]$lhs, inspect(arPD)[1:50,]$rhs) )
+plot(graph.arPD, edge.arrow.size=0.1, edge.curved=0.3)
 
 
-########## (P) 課前準備 ########## 
-##== (1) 從微信群組下載 本份講義程式檔 Rtech05.R 放入本門課課程目錄，並以 RStudio開啟
-##== (2) 若見到本編程檔為中文亂碼，請以 File-->Reopen with Encoding --> UTF8，則可看到中文碼顯示
-##== (3) 修改本程式第4行，設定工作目錄為 本門課工作目錄
-##== (4) 下載本門課所需之軟件包至本機備用 -- 下行安裝指令只需執行一次
-# install.packages( c("data.table") )    
-##== (5) 從微信群組下載 RR1_500r6810.csv, RR501_1000r6217.csv, RR1001_1500r7707.csv, 
-#                       RR"1501_2000r8262.csv 數據檔，放入 本門課工作目錄，作為本課程待用
 
+#=========R-tech5================
 
-########## (1) 機器學習與監督式學習 ##########
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
+X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
+XX = X[,c("Year","Installs")];XX
+plot(Installs~Year, data = XX)
+cor()
 
-#####=====*(1A) 回歸、分類和聚類的關係 [殷,6.1] =====#####
-##== 課本上的名詞
-#    -- 回歸(regression): 通過函數表達連續數據映射的關係，來發現屬性值之間的依賴關係
-#       -- 預測回歸: 建立連續值函式的預測模型，可預測缺失的/難以獲得的數值數據值
-#    -- 分類(classification): 找出一組離散數據對象的共同特點，按照分類模式將其劃分為不同的類
-#       -- 預測分類: 找出描述和區分數據類/概念的模型，以預測未知類標號對象的類標號
-#    -- 聚類(clustering): 把數據對象集，劃分成多個組/簇的過程，使得簇內的對具有很高的相似性
-#       -- 與分類類似，但每個客戶(對象)的類標號是未知的，需要發現這些分組(簇)
-##== 課本上的另一組定義
-#    -- 有監督學習(supervised learning)
-#       -- 監督: 訓練數據(觀察,測量等)都帶有標籤
-#       -- 監督學習: 學習已經創建好的分類系統，學習後可以根據訓練集分類新數據
-#    -- 無監督學習(unsupervised learning)
-#       -- 無監督: 訓練集的類別(標籤)未知
-#       -- 無監督學習: 給定一個觀察、測量等的數據集，以建立數據中存在的數據類或簇
+cor(XX)
 
-#####===== (1B) (HUT06-1B) 數據模型(Data Model)符號 =====#####
-##== 系統/模型/函數(System/Model/Function, M):  因變量/輸出數據y = M( 自變量/輸入數據u )  
-#    -- (1) 訓練階段(Training/Learning/Modeling/Estimation Phase): (u, y) -> M
-#             由輸入/輸出 u與y，求取(估測estimate)模型M#
-#    -- (2) 應用階段(Prediction/Estimation/Production/Application Phase): (u_new, M#) -> y_predict
-#             以所估測的模型M#與新的輸入 u_new，求取(估測)新的輸出 y_predict
-##== 機器學習(Machine Learning)
-#    -- (1) 監督式學習 (Supervised learning): 具範例(u,y), y為教師(teacher, desired output) y, 以求得y=M(u)
-#           (1A)迴歸(regression):     y 為連續數據   --> 本單元 HUT07
-#           (1B)分類(classification): y 為離散數據   --> 下一單元 HUT08   
-#    -- (2) 無監督式學習 (Unsupervised learning): 無輸出y, 目標在於發掘輸入(u)的隱含特徵 --> 數據挖掘(Data Mining)
-#           (2A)聚類(clustering):           計算數據u的相似度，以產生其分類。 --> 上兩單元HUT05
-#           (2B)關聯規則(association rule): 計算多數據(ui-uj)間的關連。       --> 前一單元HUT06
-#           (2C)數據序列(data sequencing):  計算多數據(ui-uj)間的時序關係。   --> 未列入本課程
+X.lm = lm(Installs ~ Reviews, data = X)  #--> linear model lm() 即為線性回歸的模型 M()
+X.lm
 
-#####===== (1C) 以數據模型符號重讀[殷,6.1]:模型回歸、分類和聚類的關係 =====#####
-##== 課本上的名詞
-#    -- 回歸(regression): 通過函數(M)表達連續數據映射(u->y)的關係，來發現屬性值之間的依賴關係
-#                         : M(u)=y, y為連續值
-#       -- 預測回歸: 建立連續值函數的預測模型(y=M(u))，可預測缺失的/難以獲得的數值數據值(u_new)
-#                    : M(u_new)=y_predict
-#    -- 分類(classification): 找出一組離散數據對象(y)的共同特點，按照分類模式(y=M(u))將其劃分為不同的類y
-#                             : M(u)=y, y為離散值
-#       -- 預測分類: 找出描述和區分數據類/概念的模型(y=M(u))，以預測未知類標號對象(u_new)的類標號(y_predict)
-#                    : M(u_new)=y_predict
-#    -- 聚類(clustering): 把數據對象集(u, 無y)，劃分成多個組/簇(求取M(u))的過程，使得簇內的對具有很高的相似性
-#       -- 與分類類似，但每個客戶(對象)的類標號是未知(無y)的，需要發現這些分組(簇)(求取M(u))
-##== 課本上的另一組定義
-#    -- 有監督學習(supervised learning): M(u)=y
-#       -- 監督: 訓練數據(觀察,測量等)都帶有標籤(y,可稱之為desired output, teacher)
-#       -- 監督學習: 學習已經創建好的分類系統(y=M(u))，學習後可以根據訓練集分類新數據(y_predict=M(u_new))
-#    -- 無監督學習(unsupervised learning): M(u) ... 無y
-#       -- 無監督: 訓練集的類別(標籤,y)未知(無y,teacher)
-#       -- 無監督學習: 給定一個觀察、測量等的數據集(u)，以建立數據中存在的數據類或簇(求取M(u))
+w = coef(X.lm);  w
+# (Intercept)       speed  --> 表示線性回歸式為   y =     w0      +       w1 * u  
+#  -17.579095    3.932409                      dist = (-17.579095) + (3.932409) * speed
+plot(Installs ~ Reviews, data = X)
+abline(coef(X.lm))
 
+u = X$Reviews;   mean(u)   
+y = X$Installs;    mean(y)   
+w1 = sum((u-mean(u))*(y-mean(y)))/sum((u-mean(u))^2) ;   w1   #-- = 5387.4/1370 = 3.932409
+w0 = mean(y) - w1 * mean(u);   w0
 
-########## (2) 回歸的基本概念 (以cars數據為例) ##########
+X1 = data.frame(Reviews=c(100,1000,1e+07,2e+07))
+##== 預測函式(predict())
+X1$install = predict(X.lm, newdata=X1)  
+X1
+
+#+++++++++++++++++++++++++++++++++
+setwd("/Users/juck30808/Documents/Github/USC_R_Git/2.R-tech/data")
+X = read.csv("googleplaystore4_(7000).csv");   dim(X);   head(X,2) 
+
+table(X$Rating)
+X$Rating
+
+cars
 
 #####===== (2A) 一個簡單的回歸數據例子: cars =====#####
 ##== 車速(speed)與停(刹)車距離(dist)的關係
@@ -214,8 +313,8 @@ U = 1/zeta;   U
 # [1] 20.000000  16.666667  14.285714  10.000000   7.142857   5.000000   4.000000   3.225806   2.631579   2.325581   2.127660
 ##== 檢視(U,Y)的相關係數(correlation coefficient):
 r = cor(U,Y);   r   #-- = Ruy/sqrt(Ruu*Ryy) = (sum(U*Y)-k*mean(U)*mean(Y)) / ( sum((U-mean(U))^2) * sum((Y-mean(Y))^2) ) 
-                    #-- = [1] -0.9982764    
-                    #-- [殷,p.154] n=2 之 (n-2)=(11-2)=9 自由度 的相關性係數顯著性為0.602/0.735 (對顯著性水平=0.05/0.01)
+#-- = [1] -0.9982764    
+#-- [殷,p.154] n=2 之 (n-2)=(11-2)=9 自由度 的相關性係數顯著性為0.602/0.735 (對顯著性水平=0.05/0.01)
 ##== 代入 線性回歸模型 的數據準備(形成數據框)
 UY = data.frame(U=U,Y=Y);   head(UY,2)
 #          U         Y
@@ -285,7 +384,7 @@ MSE = 1/length(actual)*sum((actual-predicted)^2);    MSE   #-- [1] 227.0704
 RMSE = sqrt(1/length(actual)*sum((actual-predicted)^2));   RMSE   #-- [1] 15.06886
 ##== 平均均方對數誤差(Mean Squared Logarithmic Error) MSLE
 MSLE = 1/length(actual)*sum((log(1+actual,base=exp(1))-log(1+predicted,base=exp(1)))^2,na.rm=T);   
-       MSLE  #-- [1] 0.1250257  因為log()中會有負值,相加時必須加上 na.rm=T (NA removed)
+MSLE  #-- [1] 0.1250257  因為log()中會有負值,相加時必須加上 na.rm=T (NA removed)
 
 #####====== (5E) 多預測量的評估--相對誤差: 檢驗誤差/泛化誤差 =====#####
 ##== 相對絕對誤差(Relative Absolute Error)
@@ -388,3 +487,28 @@ R_squared2 = 1-sum((actual-predicted)^2)/sum((actual-mean(actual))^2);   R_squar
 ##== (RVE) 連續型監督式學習的評估常用 均方根誤差(Root Mean Squared Error, RMSE)，表示指真實值和"預測值"間的誤差。
 ##== (RVF) 在回歸模型的預測實務中，當選擇適當的變量後，可以 "lm()" 來訓練變量間的線性回歸模型。
 
+
+
+
+
+# #=========================
+# XX = as.data.frame(X);
+# XX$ym = substr(XX$'Last Updated',1,7)
+# XX$date = as.Date(X$`Last Updated`)
+# XX$dd   = as.integer(XX$date - min(XX$date))
+# XX$mm   = as.integer(XX$dd / 30 ) + 1
+# head(XX,2)
+# 
+# TMC0 = round((table( XX$Category) > 0),1)
+# dim(TMC0)
+# 
+# TMC = TMC0[1:33,]
+# txTMC = lapply( 1:dim(TMC), FUN=function(k) colnames(TMC)[which(TMC[k,]>0)] )
+# arTMC = apriori( txTMC, parameter=list(support=0.3, confidence=0.6), control=list(verbose=FALSE) )
+# inspect(arTMC)
+# 
+# XXX = XX[,c("mm","Installs")]
+# library(data.table)
+# setDT(XX,key=c("mm"))
+# maxXX = XX[, .(maxInstalls=max(Installs)), by=mm]
+# plot(maxXX)
