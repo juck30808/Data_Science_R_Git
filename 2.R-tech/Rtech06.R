@@ -149,8 +149,8 @@ iris.rpart = rpart(Species ~. , data=iris);   print(iris.rpart)
 ##== 繪出決策樹
 rpart.plot(iris.rpart)
 ##== 預測值
-Species.new.rpart3 = predict(iris.rpartA, newdata=iris);   Species.new.rpart3
-Species.new.rpart = apply(Species.new.rpart3, 1, which.max)
+Species.new.rpart3 = predict(iris.rpart, newdata=iris);   Species.new.rpart3
+Species.new.rpart = apply(Species.new.rpart3, 1, which.max)  Species.new.rpart
 ##== 混淆矩陣
 table( Species.new.rpart, Species)
 #                   Species

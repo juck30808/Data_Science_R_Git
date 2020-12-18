@@ -149,7 +149,7 @@ dim(X); head(X,2)
 attach(X)   ##== (1) 設定數據框為X, 可以精簡以下的變量表示
 plot.app <- function(xx,yy,xxlab,yylab) {
   plot(NULL,xlim=range(xx),ylim=range(yy),
-       main="classified scatter plot of iris data",
+       main="Type of Apps (Free / Paid)",
        xlab=xxlab,ylab=yylab)
   points(xx[Type=="Free"],yy[Type=="Free"],pch=1,col="blue")
   points(xx[Type=="Paid"],yy[Type== "Paid"],pch=2,col="red")
@@ -160,72 +160,35 @@ plot.app <- function(xx,yy,xxlab,yylab) {
          pch=c(1,2))
 }
 Reviews.log =log10(Reviews)
+X$Reviews.log =log10(X$Reviews)
 Rating.log = log10(Rating)
 plot.app(Rating,Reviews.log, "Rating", "Reviews")  #收費不一定比較好
+abline(h=2.45,col="purple");  segments(1.75,2.45,1.75,7,col="pink");  segments(0,4.95,1.75,4.95,col="red");
 
-#####=====*(2B) iris例說明決策樹tree操作程序及其中觀念 [殷,7.2, 7.9.2] =====#####
-library(tree);library(rpart)
-#因變數   #自變數  #資料源
-iris.tree = tree(Type ~ Rating + Reviews, data=X[c(1:10,170:220),]);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
 
-X$Reviews.log =log10(X$Reviews)
+library(tree);library(rpart); library(rpart.plot)
+
+#####===== 繪製決策樹&訓練模型 =====#####
 XX = as.data.frame(X[c(1:10,170:220),c("Rating","Reviews.log","Type")]);   dim(XX);   head(XX,2)
-# iris.tree = tree(Type ~ Rating + Reviews.log, data=XX);    iris.tree   #-- * denotes terminal node(葉結點或終結點)
-# iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX);    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX, 
-                   control=rpart.control(minsplit=6, maxdepth=4));    iris.rpart   #-- * denotes terminal node(葉結點或終結點)
-
-
-
-
-##== 繪製決策樹
-plot(iris.tree);     text(iris.tree)  #-- 6個葉結點, 其餘均為決策結點, 數據分裂為二元劃分
-Species.new.tree3 = predict(iris.tree, newdata=X,level=0.95,interval="confidence")
-plot.app(Rating.log,Reviews.log, "Rating", "Reviews")
-
-abline(h=2.45,col="purple");  
-segments(1.75,2.45,1.75,7,col="pink");  
-segments(0,4.95,1.75,4.95,col="red");
-
-Species.new.tree = apply(Species.new.tree3, 1, which.max); 
-Species.new.tree[41:60] 
-
-#-- 將150*3的陣列 轉成 150*1 的向量
-# 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 
-#  1  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2  2 
-table(Species.new.tree, Species)
-#                  Species
-# Species.new.tree setosa versicolor virginica
-#                1     50          0         0
-#                2      0         47         1
-#                3      0          3        49'
+                   #因變數   #自變數
+# iris.tree = tree(Type ~ Rating + Reviews.log, data=XX);    iris.tree   
+# iris.tree = tree(Type ~ Rating + Reviews, data=X[c(1:10,170:220),]);    iris.tree   
+iris.rpart = rpart(Type ~ Rating + Reviews.log, data=XX,
+                  control=rpart.control(minsplit=6, maxdepth=4));    iris.rpart
+Type = predict(iris.rpart, newdata=X,level=0.95,interval="confidence")
+print(iris.rpart); text(iris.rpart)  ;rpart.plot(iris.rpart)
 
 
-##== 訓練模型
-library(rpart);   library(rpart.plot)
-iris.rpart = rpart(Species ~. , data=iris);   print(iris.rpart)
-# 1) root 150 100 setosa (0.33333333 0.33333333 0.33333333)  
-#   2) Petal.Length< 2.45 50   0 setosa (1.00000000 0.00000000 0.00000000) *
-#   3) Petal.Length>=2.45 100  50 versicolor (0.00000000 0.50000000 0.50000000)  
-#     6) Petal.Width< 1.75 54   5 versicolor (0.00000000 0.90740741 0.09259259) *
-#     7) Petal.Width>=1.75 46   1 virginica (0.00000000 0.02173913 0.97826087) *
-##== 繪出決策樹
-rpart.plot(iris.rpart)
-##== 預測值
-Species.new.rpart3 = predict(iris.rpartA, newdata=iris);   Species.new.rpart3
-Species.new.rpart = apply(Species.new.rpart3, 1, which.max)
-##== 混淆矩陣
-table( Species.new.rpart, Species)
-#                   Species
-# Species.new.rpart setosa versicolor virginica
-#                 1     50          0         0
-#                 2      0         47         1
-#                 3      0          3        49
-##== rpart決策樹參數
-#    -- minsplit：每一個節點的最少數據(data)數
-#    -- minbucket：終端節點(terminal node)的最少數據(data)數
-#    -- maxdepth：決策樹的深度
+#####===== 繪製決策樹&訓練模型 =====#####
+XX = as.data.frame(X[c(1:10,170:220),c("Rating","Reviews.log","Type")]);   dim(XX);   head(XX,2)
+                    #因變數   #自變數
+iris.rpart = rpart(Rating ~ Reviews.log, data=XX);    iris.rpart
+
+Type = predict(iris.rpart, newdata=X,level=0.95,interval="confidence")
+print(iris.rpart);  text(iris.rpart)  ;rpart.plot(iris.rpart)
+
+
+
 ##== 加上參數求得的決策樹
 iris.rpartA = rpart(Species ~. , data=iris, control=rpart.control(minsplit=6, maxdepth=4))
 rpart.plot(iris.rpartA)
