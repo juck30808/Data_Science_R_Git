@@ -1,0 +1,19 @@
+<h1 id="example-10.1-of-section-10.2.1">example 10.1 of section 10.2.1</h1>
+<h1 id="example-10.1-of-section-10.2.1-documentation-and-deployment-using-knitr-to-produce-milestone-documentation-what-is-knitr">(example 10.1 of section 10.2.1) : Documentation and deployment : Using knitr to produce milestone documentation : What is knitr?</h1>
+<h1 id="title-knitr-annotated-markdown">Title: knitr-annotated Markdown</h1>
+<h1 id="annotation-marks-were-interfering-with-execution.">Annotation marks were interfering with execution.</h1>
+<h1 id="this-is-also-the-file-to-be-saved-as-simple.rmd">This is also the file to be saved as &quot;simple.Rmd&quot;</h1>
+<p>Two examples:</p>
+<ul>
+<li>plotting</li>
+<li>calculating</li>
+</ul>
+<p>Plot example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+
+<span class="kw">ggplot</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">100</span>),<span class="dt">y=</span><span class="kw">sin</span>(<span class="fl">0.1</span>*<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">100</span>)))) +
+<span class="st">   </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y))</code></pre></div>
+<p><img src="00203_example_10.1_of_section_10.2.1_files/figure-markdown_github/plotexample-1.png" style="display: block; margin: auto;" /></p>
+<p>Calculation example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pi*pi</code></pre></div>
+<pre><code>## [1] 9.869604</code></pre>

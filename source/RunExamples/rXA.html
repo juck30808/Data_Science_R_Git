@@ -1,0 +1,746 @@
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/x0A_Working_with_R_and_other_tools&#39;</span>,
+       <span class="st">&#39;../SQLExample&#39;</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  226 Fri Jun 17 10:29:12 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00226_informalexample_A.1_of_section_A.1.5.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # informalexample A.1 of section A.1.5 
+&gt; # (informalexample A.1 of section A.1.5)  : Working with R and other tools : Installing the tools : R resources 
+&gt; 
+&gt; install.packages(&#39;ctv&#39;,repos=&#39;https://cran.r-project.org&#39;)
+
+The downloaded binary packages are in
+    /var/folders/7q/h_jp2vj131g5799gfnpzhdp80000gn/T//RtmpiXUnN0/downloaded_packages
+
+&gt; library(&#39;ctv&#39;)
+
+&gt; # install.views(&#39;TimeSeries&#39;) # can take a LONG time
+&gt; 
+[1] &quot;############################### end  226 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  227 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00227_example_A.1_of_section_A.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.1 of section A.2 
+&gt; # (example A.1 of section A.2)  : Working with R and other tools : Starting with R 
+&gt; # Title: Trying a few R commands 
+&gt; 
+&gt; 1
+[1] 1
+
+&gt; ## [1] 1
+&gt; 1/2
+[1] 0.5
+
+&gt; ## [1] 0.5
+&gt; &#39;Joe&#39;
+[1] &quot;Joe&quot;
+
+&gt; ## [1] &quot;Joe&quot;
+&gt; &quot;Joe&quot;
+[1] &quot;Joe&quot;
+
+&gt; ## [1] &quot;Joe&quot;
+&gt; &quot;Joe&quot;==&#39;Joe&#39;
+[1] TRUE
+
+&gt; ## [1] TRUE
+&gt; c()
+NULL
+
+&gt; ## NULL
+&gt; is.null(c())
+[1] TRUE
+
+&gt; ## [1] TRUE
+&gt; is.null(5)
+[1] FALSE
+
+&gt; ## [1] FALSE
+&gt; c(1)
+[1] 1
+
+&gt; ## [1] 1
+&gt; c(1,2)
+[1] 1 2
+
+&gt; ## [1] 1 2
+&gt; c(&quot;Apple&quot;,&#39;Orange&#39;)
+[1] &quot;Apple&quot;  &quot;Orange&quot;
+
+&gt; ## [1] &quot;Apple&quot;  &quot;Orange&quot;
+&gt; length(c(1,2))
+[1] 2
+
+&gt; ## [1] 2
+&gt; vec &lt;- c(1,2)
+
+&gt; vec
+[1] 1 2
+
+&gt; ## [1] 1 2
+&gt; 
+[1] &quot;############################### end  227 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  228 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00228_informalexample_A.2_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # informalexample A.2 of section A.2.1 
+&gt; # (informalexample A.2 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; 
+&gt; x &lt;- 2
+
+&gt; x &lt; - 3
+[1] FALSE
+
+&gt; ## [1] FALSE
+&gt; print(x)
+[1] 2
+
+&gt; ## [1] 2
+&gt; 
+[1] &quot;############################### end  228 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  229 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00229_example_A.2_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.2 of section A.2.1 
+&gt; # (example A.2 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; # Title: Binding values to function arguments 
+&gt; 
+&gt; divide &lt;- function(numerator,denominator) { numerator/denominator }
+
+&gt; divide(1,2)
+[1] 0.5
+
+&gt; ## [1] 0.5
+&gt; divide(2,1)
+[1] 2
+
+&gt; ## [1] 2
+&gt; divide(denominator=2,numerator=1)
+[1] 0.5
+
+&gt; ## [1] 0.5
+&gt; divide(denominator&lt;-2,numerator&lt;-1)  # yields 2, a wrong answer
+[1] 2
+
+&gt; ## [1] 2
+&gt; 
+[1] &quot;############################### end  229 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  230 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00230_example_A.3_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.3 of section A.2.1 
+&gt; # (example A.3 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; # Title: Demonstrating side effects 
+&gt; 
+&gt; x&lt;-1
+
+&gt; good &lt;- function() { x &lt;- 5}
+
+&gt; good()
+
+&gt; print(x)
+[1] 1
+
+&gt; ## [1] 1
+&gt; bad &lt;- function() { x &lt;&lt;- 5}
+
+&gt; bad()
+
+&gt; print(x)
+[1] 5
+
+&gt; ## [1] 5
+&gt; 
+[1] &quot;############################### end  230 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  231 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00231_example_A.4_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.4 of section A.2.1 
+&gt; # (example A.4 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; # Title: R truth tables for Boolean operators 
+&gt; 
+&gt; c(T,T,F,F) == c(T,F,T,F)
+[1]  TRUE FALSE FALSE  TRUE
+
+&gt; ## [1]  TRUE FALSE FALSE  TRUE
+&gt; c(T,T,F,F) &amp; c(T,F,T,F)
+[1]  TRUE FALSE FALSE FALSE
+
+&gt; ## [1]  TRUE FALSE FALSE FALSE
+&gt; c(T,T,F,F) | c(T,F,T,F)
+[1]  TRUE  TRUE  TRUE FALSE
+
+&gt; ## [1]  TRUE  TRUE  TRUE FALSE
+&gt; 
+[1] &quot;############################### end  231 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  232 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00232_informalexample_A.3_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # informalexample A.3 of section A.2.1 
+&gt; # (informalexample A.3 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; 
+&gt; add &lt;- function(a,b) { a + b}
+
+&gt; add(1,2)
+[1] 3
+
+&gt; ## [1] 3
+&gt; 
+[1] &quot;############################### end  232 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  233 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  /Users/johnmount/Documents/work/PracticalDataScienceWithR/zmPDSwR/RunExamples/replacements/00233_informalexample_A.4_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # informalexample A.4 of section A.2.1 
+&gt; # (informalexample A.4 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; 
+&gt; # In knitr/Markdown we need to catch the error.
+&gt; 
+&gt; tryCatch(add(1,&#39;fred&#39;),
+    error=function(x) print(x))
+&lt;simpleError in a + b: non-numeric argument to binary operator&gt;
+
+&gt; ## Error in a + b : non-numeric argument to binary operator
+&gt; 
+[1] &quot;############################### end  233 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  234 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00234_example_A.5_of_section_A.2.1.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.5 of section A.2.1 
+&gt; # (example A.5 of section A.2.1)  : Working with R and other tools : Starting with R : Primary features of R 
+&gt; # Title: Call-by-value effect 
+&gt; 
+&gt; vec &lt;- c(1,2)
+
+&gt; fun &lt;- function(v) { v[[2]]&lt;-5; print(v)}
+
+&gt; fun(vec)
+[1] 1 5
+
+&gt; ## [1] 1 5
+&gt; print(vec)
+[1] 1 2
+
+&gt; ## [1] 1 2
+&gt; 
+[1] &quot;############################### end  234 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  235 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00235_informalexample_A.5_of_section_A.2.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # informalexample A.5 of section A.2.2 
+&gt; # (informalexample A.5 of section A.2.2)  : Working with R and other tools : Starting with R : Primary R data types 
+&gt; 
+&gt; vec &lt;- c(2,3)
+
+&gt; vec[[2]] &lt;- 5
+
+&gt; print(vec)
+[1] 2 5
+
+&gt; ## [1] 2 5
+&gt; 
+[1] &quot;############################### end  235 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  236 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00236_example_A.6_of_section_A.2.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.6 of section A.2.2 
+&gt; # (example A.6 of section A.2.2)  : Working with R and other tools : Starting with R : Primary R data types 
+&gt; # Title: Examples of R indexing operators 
+&gt; 
+&gt; x &lt;- list(&#39;a&#39;=6,b=&#39;fred&#39;)
+
+&gt; names(x)
+[1] &quot;a&quot; &quot;b&quot;
+
+&gt; ## [1] &quot;a&quot; &quot;b&quot;
+&gt; x$a
+[1] 6
+
+&gt; ## [1] 6
+&gt; x$b
+[1] &quot;fred&quot;
+
+&gt; ## [1] &quot;fred&quot;
+&gt; x[[&#39;a&#39;]]
+[1] 6
+
+&gt; ## $a
+&gt; ## [1] 6
+&gt; 
+&gt; x[c(&#39;a&#39;,&#39;a&#39;,&#39;b&#39;,&#39;b&#39;)]
+$a
+[1] 6
+
+$a
+[1] 6
+
+$b
+[1] &quot;fred&quot;
+
+$b
+[1] &quot;fred&quot;
+
+
+&gt; ## $a
+&gt; ## [1] 6
+&gt; ##
+&gt; ## $a
+&gt; ## [1] 6
+&gt; ##
+&gt; ## $b
+&gt; ## [1] &quot;fred&quot;
+&gt; ##
+&gt; ## $b
+&gt; ## [1] &quot;fred&quot;
+&gt; 
+[1] &quot;############################### end  236 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  237 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00237_example_A.7_of_section_A.2.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.7 of section A.2.2 
+&gt; # (example A.7 of section A.2.2)  : Working with R and other tools : Starting with R : Primary R data types 
+&gt; # Title: R’s treatment of unexpected factor levels 
+&gt; 
+&gt; factor(&#39;red&#39;,levels=c(&#39;red&#39;,&#39;orange&#39;))
+[1] red
+Levels: red orange
+
+&gt; ## [1] red
+&gt; ## Levels: red orange
+&gt; factor(&#39;apple&#39;,levels=c(&#39;red&#39;,&#39;orange&#39;))
+[1] &lt;NA&gt;
+Levels: red orange
+
+&gt; ## [1] &lt;NA&gt;
+&gt; ## Levels: red orange
+&gt; 
+[1] &quot;############################### end  237 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  238 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00238_example_A.8_of_section_A.2.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.8 of section A.2.2 
+&gt; # (example A.8 of section A.2.2)  : Working with R and other tools : Starting with R : Primary R data types 
+&gt; # Title: Confirm lm() encodes new strings correctly. 
+&gt; 
+&gt; d &lt;- data.frame(x=factor(c(&#39;a&#39;,&#39;b&#39;,&#39;c&#39;)),
+                    y=c(1,2,3))
+
+&gt; m &lt;- lm(y~0+x,data=d)     # Note: 1 
+
+&gt; print(predict(m,
+    newdata=data.frame(x=&#39;b&#39;))[[1]])    # Note: 2 
+[1] 2
+
+&gt; # [1] 2
+&gt; print(predict(m,
+    newdata=data.frame(x=factor(&#39;b&#39;,levels=c(&#39;b&#39;))))[[1]])  # Note: 3 
+[1] 2
+
+&gt; # [1] 2
+&gt; 
+&gt; # Note 1: 
+&gt; #   Build a data frame and linear model mapping 
+&gt; #   a,b,c to 1,2,3. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Show that model gets correct prediction for 
+&gt; #   b as a string. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Show that model gets correct prediction for 
+&gt; #   b as a factor, encoded with a different number of 
+&gt; #   levels. This shows that lm() is correctly treating 
+&gt; #   factors as strings. 
+&gt; 
+[1] &quot;############################### end  238 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;############################### start  239 Fri Jun 17 10:29:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00239_example_A.9_of_section_A.2.3.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.9 of section A.2.3 
+&gt; # (example A.9 of section A.2.3)  : Working with R and other tools : Starting with R : Loading data from HTTPS sources 
+&gt; # Title: Loading UCI car data directly from GitHub using HTTPS 
+&gt; 
+&gt; require(RCurl)    # Note: 1 
+
+Loading required package: RCurl
+
+Loading required package: bitops
+
+
+&gt; urlBase &lt;- 
+   &#39;https://raw.githubusercontent.com/WinVector/zmPDSwR/master/&#39;    # Note: 2 
+
+&gt; mkCon &lt;- function(nm) {   # Note: 3 
+    textConnection(getURL(paste(urlBase,nm,sep=&#39;/&#39;)))
+ }
+
+&gt; cars &lt;- read.table(mkCon(&#39;car.data.csv&#39;),     # Note: 4 
+     sep=&#39;,&#39;,header=T,comment.char=&#39;&#39;)
+
+&gt; # Note 1: 
+&gt; #   Bring in the RCurl library for more connection 
+&gt; #   methods. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Form a valid HTTPS base URL for raw access to 
+&gt; #   the GitHub repository. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Define a function that wraps a URL path 
+&gt; #   fragment into a usable HTTPS connection. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Load the car data from GitHub over 
+&gt; #   HTTPS. 
+&gt; 
+[1] &quot;############################### end  239 Fri Jun 17 10:29:22 2016&quot;
+[1] &quot;############################### start  240 Fri Jun 17 10:29:22 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00240_example_A.10_of_section_A.3.2.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.10 of section A.3.2 
+&gt; # (example A.10 of section A.3.2)  : Working with R and other tools : Using databases with R : Starting with SQuirreL SQL 
+&gt; # Title: Reading database data into R 
+&gt; 
+&gt; install.packages(&#39;RJDBC&#39;,repos=&#39;https://cran.r-project.org&#39;)      # Note: 1 
+
+The downloaded binary packages are in
+    /var/folders/7q/h_jp2vj131g5799gfnpzhdp80000gn/T//RtmpiXUnN0/downloaded_packages
+
+&gt; library(&#39;RJDBC&#39;)  # Note: 2 
+
+Loading required package: DBI
+
+Loading required package: rJava
+
+
+Attaching package: &#39;rJava&#39;
+
+The following object is masked from &#39;package:RCurl&#39;:
+
+    clone
+
+
+&gt; drv &lt;- JDBC(&quot;org.h2.Driver&quot;,&quot;h2-1.3.170.jar&quot;,identifier.quote=&quot;&#39;&quot;)    # Note: 3 
+
+&gt; conn &lt;- dbConnect(drv,&quot;jdbc:h2:h2demodb_h2&quot;,&quot;u&quot;,&quot;u&quot;)  # Note: 4 
+
+&gt; d &lt;- dbGetQuery(conn,&quot;SELECT * FROM example_table&quot;)   # Note: 5 
+
+&gt; print(d)      # Note: 6 
+  STATIDID NAME
+1        1  Joe
+2        2 Fred
+
+&gt; ##   STATUSID NAME
+&gt; ## 1        1  Joe
+&gt; ## 2        2 Fred        # Note: 7
+&gt; 
+&gt; # Note 1: 
+&gt; #   Install the RJDBC package from the CRAN 
+&gt; #   package repository. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Load the RJDBC library. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Use the RJDBC library to build a database 
+&gt; #   driver. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Use the database driver to build a database 
+&gt; #   connection. In our SQuirreL SQL example, we used 
+&gt; #   the path /Users/johnmount/Downloads/h2demodb_h2. 
+&gt; #   So the path fragment given here (h2demodb_h2) 
+&gt; #   works only if R is working in the directory 
+&gt; #   /Users/johnmount/Downloads. You would alter all of 
+&gt; #   these paths and URLs to work for your own 
+&gt; #   directories. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Run a SQL select query using the database 
+&gt; #   connection to populate a data frame. 
+&gt; 
+&gt; # Note 6: 
+&gt; #   Print the result data frame. 
+&gt; 
+&gt; # Note 7: 
+&gt; #   The database table as an R data frame. 
+&gt; 
+[1] &quot;############################### end  240 Fri Jun 17 10:29:26 2016&quot;
+[1] &quot;############################### start  241 Fri Jun 17 10:29:26 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00241_example_A.11_of_section_A.3.4.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.11 of section A.3.4 
+&gt; # (example A.11 of section A.3.4)  : Working with R and other tools : Using databases with R : An example SQL data transformation task 
+&gt; # Title: Loading an Excel spreadsheet 
+&gt; 
+&gt; library(gdata)
+
+gdata: read.xls support for &#39;XLS&#39; (Excel 97-2004) files ENABLED.
+
+gdata: read.xls support for &#39;XLSX&#39; (Excel 2007+) files ENABLED.
+
+
+Attaching package: &#39;gdata&#39;
+
+The following object is masked from &#39;package:stats&#39;:
+
+    nobs
+
+The following object is masked from &#39;package:utils&#39;:
+
+    object.size
+
+The following object is masked from &#39;package:base&#39;:
+
+    startsWith
+
+
+&gt; bookings &lt;- read.xls(&#39;Workbook1.xlsx&#39;,sheet=1,pattern=&#39;date&#39;,
+    stringsAsFactors=F,as.is=T)
+
+&gt; prices &lt;- read.xls(&#39;Workbook1.xlsx&#39;,sheet=2,pattern=&#39;date&#39;,
+    stringsAsFactors=F,as.is=T)
+[1] &quot;############################### end  241 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;############################### start  242 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00242_example_A.12_of_section_A.3.4.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.12 of section A.3.4 
+&gt; # (example A.12 of section A.3.4)  : Working with R and other tools : Using databases with R : An example SQL data transformation task 
+&gt; # Title: The hotel reservation and price data 
+&gt; 
+&gt; print(bookings)
+        date day.of.stay X1.before X2.before X3.before
+1 2013-07-01         105        98        95        96
+2 2013-07-02         103       100        98        95
+3 2013-07-03         105        95        90        80
+4 2013-07-04         105       105       107        98
+
+&gt; ##         date day.of.stay X1.before X2.before X3.before
+&gt; ## 1 2013-07-01         105        98        95        96
+&gt; ## 2 2013-07-02         103       100        98        95
+&gt; ## 3 2013-07-03         105        95        90        80
+&gt; ## 4 2013-07-04         105       105       107        98
+&gt; print(prices)
+        date day.of.stay X1.before X2.before X3.before
+1 2013-07-01     $250.00   $200.00   $280.00   $300.00
+2 2013-07-02     $200.00   $250.00   $290.00   $250.00
+3 2013-07-03     $200.00   $200.00   $250.00   $275.00
+4 2013-07-04     $250.00   $300.00   $300.00   $200.00
+
+&gt; ##         date day.of.stay X1.before X2.before X3.before
+&gt; ## 1 2013-07-01     $250.00   $200.00   $280.00   $300.00
+&gt; ## 2 2013-07-02     $200.00   $250.00   $290.00   $250.00
+&gt; ## 3 2013-07-03     $200.00   $200.00   $250.00   $275.00
+&gt; ## 4 2013-07-04     $250.00   $300.00   $300.00   $200.00
+&gt; 
+[1] &quot;############################### end  242 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;############################### start  243 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00243_example_A.13_of_section_A.3.4.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.13 of section A.3.4 
+&gt; # (example A.13 of section A.3.4)  : Working with R and other tools : Using databases with R : An example SQL data transformation task 
+&gt; # Title: Using melt to restructure data 
+&gt; 
+&gt; library(&#39;reshape2&#39;)
+
+&gt; bthin &lt;- melt(bookings,id.vars=c(&#39;date&#39;),
+    variable.name=&#39;daysBefore&#39;,value.name=&#39;bookings&#39;)   # Note: 1 
+
+&gt; pthin &lt;- melt(prices,id.vars=c(&#39;date&#39;),
+    variable.name=&#39;daysBefore&#39;,value.name=&#39;price&#39;)  # Note: 2 
+
+&gt; daysCodes &lt;- c(&#39;day.of.stay&#39;, &#39;X1.before&#39;, &#39;X2.before&#39;, &#39;X3.before&#39;)
+
+&gt; bthin$nDaysBefore &lt;- match(bthin$daysBefore,daysCodes)-1  # Note: 3 
+
+&gt; pthin$nDaysBefore &lt;- match(pthin$daysBefore,daysCodes)-1  # Note: 4 
+
+&gt; pthin$price &lt;- as.numeric(gsub(&#39;\\$&#39;,&#39;&#39;,pthin$price))     # Note: 5 
+
+&gt; print(head(pthin))
+        date  daysBefore price nDaysBefore
+1 2013-07-01 day.of.stay   250           0
+2 2013-07-02 day.of.stay   200           0
+3 2013-07-03 day.of.stay   200           0
+4 2013-07-04 day.of.stay   250           0
+5 2013-07-01   X1.before   200           1
+6 2013-07-02   X1.before   250           1
+
+&gt; ##         date  daysBefore price nDaysBefore
+&gt; ## 1 2013-07-01 day.of.stay   250           0
+&gt; ## 2 2013-07-02 day.of.stay   200           0
+&gt; ## 3 2013-07-03 day.of.stay   200           0
+&gt; ## 4 2013-07-04 day.of.stay   250           0
+&gt; ## 5 2013-07-01   X1.before   200           1
+&gt; ## 6 2013-07-02   X1.before   250           1
+&gt; 
+&gt; # Note 1: 
+&gt; #   Use melt to change columns that are not date 
+&gt; #   (day.of.stay, Xn.before) to values stored in a new 
+&gt; #   column called daysBefore. Each booking count 
+&gt; #   becomes a new row (instead of having many 
+&gt; #   different bookings in the same row). 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Each price entry becomes a new row (instead 
+&gt; #   of having many different prices in the same 
+&gt; #   row). 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Use match and dayCodes list to convert key 
+&gt; #   strings to numeric nDaysBefore in our bookings 
+&gt; #   data. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Use match and dayCodes list to convert key 
+&gt; #   strings to numeric nDaysBefore in our price 
+&gt; #   data. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Remove dollar sign and convert prices to 
+&gt; #   numeric type. 
+&gt; 
+[1] &quot;############################### end  243 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;############################### start  244 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;#####  running  /Users/johnmount/Documents/work/PracticalDataScienceWithR/zmPDSwR/RunExamples/replacements/00244_example_A.14_of_section_A.3.4.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.14 of section A.3.4 
+&gt; # (example A.14 of section A.3.4)  : Working with R and other tools : Using databases with R : An example SQL data transformation task 
+&gt; # Title: Assembling many rows using SQL 
+&gt; 
+&gt; # Book annotation hooks inside the SQL cause problems.
+&gt; 
+&gt; options(gsubfn.engine = &quot;R&quot;)
+
+&gt; library(&#39;sqldf&#39;)
+
+Loading required package: gsubfn
+
+Loading required package: proto
+
+Loading required package: RSQLite
+
+
+&gt; joined &lt;- sqldf(&#39; 
+   select 
+      bCurrent.date as StayDate, 
+      bCurrent.daysBefore as daysBefore,
+      bCurrent.nDaysBefore as nDaysBefore,
+      p.price as price,
+      bCurrent.bookings as bookingsCurrent,
+      bPrevious.bookings as bookingsPrevious,
+      bCurrent.bookings - bPrevious.bookings as pickup
+   from
+      bthin bCurrent
+   join
+      bthin bPrevious 
+   on
+      bCurrent.date=bPrevious.date
+      and bCurrent.nDaysBefore+1=bPrevious.nDaysBefore 
+   join
+      pthin p 
+   on
+      bCurrent.date=p.date
+      and bCurrent.nDaysBefore=p.nDaysBefore 
+ &#39;)
+
+&gt; print(joined)
+     StayDate  daysBefore nDaysBefore price bookingsCurrent
+1  2013-07-01 day.of.stay           0   250             105
+2  2013-07-02 day.of.stay           0   200             103
+3  2013-07-03 day.of.stay           0   200             105
+4  2013-07-04 day.of.stay           0   250             105
+5  2013-07-01   X1.before           1   200              98
+6  2013-07-02   X1.before           1   250             100
+7  2013-07-03   X1.before           1   200              95
+8  2013-07-04   X1.before           1   300             105
+9  2013-07-01   X2.before           2   280              95
+10 2013-07-02   X2.before           2   290              98
+11 2013-07-03   X2.before           2   250              90
+12 2013-07-04   X2.before           2   300             107
+   bookingsPrevious pickup
+1                98      7
+2               100      3
+3                95     10
+4               105      0
+5                95      3
+6                98      2
+7                90      5
+8               107     -2
+9                96     -1
+10               95      3
+11               80     10
+12               98      9
+[1] &quot;############################### end  244 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;############################### start  245 Fri Jun 17 10:29:27 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/x0A_Working_with_R_and_other_tools/00245_example_A.15_of_section_A.3.4.R&quot;
+[1] &quot;#####   in directory ../SQLExample&quot;
+
+&gt; # example A.15 of section A.3.4 
+&gt; # (example A.15 of section A.3.4)  : Working with R and other tools : Using databases with R : An example SQL data transformation task 
+&gt; # Title: Showing our hotel model results 
+&gt; 
+&gt; library(&#39;ggplot2&#39;)
+
+&gt; ggplot(data=joined,aes(x=price,y=pickup)) +
+   geom_point() + geom_jitter() + geom_smooth(method=&#39;lm&#39;)</code></pre>
+<div class="figure">
+<img src="rXA_files/figure-markdown_github/xA1-1.png" alt="" />
+
+</div>
+<pre><code>&gt; print(summary(lm(pickup~price,data=joined)))
+
+Call:
+lm(formula = pickup ~ price, data = joined)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-4.614 -2.812 -1.213  3.387  6.386 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept) 11.00765    7.98736   1.378    0.198
+price       -0.02798    0.03190  -0.877    0.401
+
+Residual standard error: 4.21 on 10 degrees of freedom
+Multiple R-squared:  0.07144,   Adjusted R-squared:  -0.02142 
+F-statistic: 0.7693 on 1 and 10 DF,  p-value: 0.401
+
+
+&gt; #
+&gt; #Call:
+&gt; #lm(formula = pickup ~ price, data = joined)
+&gt; #
+&gt; #Residuals:
+&gt; #   Min     1Q Median     3Q    Max
+&gt; #-4.614 -2.812 -1.213  3.387  6.386
+&gt; #
+&gt; #Coefficients:
+&gt; #            Estimate Std. Error t value Pr(&gt;|t|)
+&gt; #(Intercept) 11.00765    7.98736   1.378    0.198
+&gt; #price       -0.02798    0.03190  -0.877    0.401
+&gt; #
+&gt; #Residual standard error: 4.21 on 10 degrees of freedom
+&gt; #Multiple R-squared:  0.07144,  Adjusted R-squared:  -0.02142
+&gt; #F-statistic: 0.7693 on 1 and 10 DF,  p-value: 0.401
+&gt; 
+[1] &quot;############################### end  245 Fri Jun 17 10:29:27 2016&quot;</code></pre>

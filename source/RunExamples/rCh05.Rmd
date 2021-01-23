@@ -1,0 +1,17 @@
+---
+title: "rCh05"
+author: "Win-Vector LLC"
+date: "December 10, 2015"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+```{r sourceFns}
+source('runDir.R')
+```
+
+```{r ch5ex, tidy=FALSE,comment='',prompt=FALSE}
+runDir('../CodeExamples/c05_Choosing_and_evaluating_models',
+       '../Spambase')
+```

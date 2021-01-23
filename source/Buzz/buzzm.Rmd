@@ -1,0 +1,223 @@
+---
+title: "Buzz model"
+output: github_document
+---
+
+# Markdown version of Buzz data analysis
+
+by: Nina Zumel and John Mount
+Win-Vector LLC
+
+
+To run this example you need a system with R installed (see [http://cran.r-project.org](http://cran.r-project.org)), and data from [https://github.com/WinVector/PDSwR2/tree/master/Buzz](https://github.com/WinVector/PDSwR2/tree/master/Buzz).
+
+
+We are not performing any new analysis here, just supplying a direct application of Random Forests on the data.
+
+Data from: [http://ama.liglab.fr/datasets/buzz/](http://ama.liglab.fr/datasets/buzz/)
+Using: 
+       [TomsHardware-Relative-Sigma-500.data](http://ama.liglab.fr/datasets/buzz/classification/TomsHardware/Relative_labeling/sigma=500/TomsHardware-Relative-Sigma-500.data)
+
+(described in [TomsHardware-Relative-Sigma-500.names](http://ama.liglab.fr/datasets/buzz/classification/TomsHardware/Relative_labeling/sigma=500/TomsHardware-Relative-Sigma-500.names) )
+
+Crypto hashes:
+shasum TomsHardware-*.txt
+*  5a1cc7863a9da8d6e8380e1446f25eec2032bd91  TomsHardware-Absolute-Sigma-500.data.txt
+*  86f2c0f4fba4fb42fe4ee45b48078ab51dba227e  TomsHardware-Absolute-Sigma-500.names.txt
+*  c239182c786baf678b55f559b3d0223da91e869c  TomsHardware-Relative-Sigma-500.data.txt
+*  ec890723f91ae1dc87371e32943517bcfcd9e16a  TomsHardware-Relative-Sigma-500.names.txt
+
+To run this example you need a system with R installed 
+(see [cran](http://cran.r-project.org)),
+Latex (see [tug](http://tug.org)) and data from 
+[PDSwR2](https://github.com/WinVector/PDSwR2/tree/master/Buzz).
+
+To run this example:
+* Download buzzm.Rmd and TomsHardware-Relative-Sigma-500.data.txt from the github URL.
+* Start a copy of R, use setwd() to move to the directory you have stored the files.
+* Make sure knitr is loaded into R ( install.packages('knitr') and
+library(knitr) ).
+* In R run: (produces [buzzm.md](https://github.com/WinVector/PDSwR2/blob/master/Buzz/buzzm.md) from buzzm.Rmd).
+```{r knitsteps,tidy=F,eval=F}
+knit('buzzm.Rmd')
+```
+
+
+
+Now you can run the following data prep steps:
+
+```{r dataprep}
+infile <- "TomsHardware-Relative-Sigma-500.data.txt"
+paste('checked at', date())
+system(paste('shasum', infile), intern=T)  # write down file hash
+buzzdata <- read.table(infile, header = FALSE, sep = ",")
+
+makevars <- function(colname, ndays = 7) {
+  sprintf("%s_%02g", colname, 0:ndays)
+}
+
+varnames <- c(
+  "num.new.disc",
+  "burstiness",
+  "number.total.disc",
+  "auth.increase",
+  "atomic.containers", # not documented
+  "num.displays", # number of times topic displayed to user (measure of interest)
+  "contribution.sparseness", # not documented
+  "avg.auths.per.disc",
+  "num.authors.topic", # total authors on the topic
+  "avg.disc.length",
+  "attention.level.author",
+  "attention.level.contrib"
+)
+
+colnames <- unlist(lapply(varnames, FUN=makevars))
+colnames <-  c(colnames, "buzz")
+colnames(buzzdata) <- colnames
+
+# Split into training and test
+set.seed(2362690L)
+rgroup <- runif(dim(buzzdata)[1])
+buzztrain <- buzzdata[rgroup > 0.1,]
+buzztest <- buzzdata[rgroup <=0.1,]
+```
+
+This currently returns a training set with `r dim(buzztrain)[[1]]` rows and a test set with 
+`r dim(buzztest)[[1]]` rows, which 
+`r ifelse(dim(buzztrain)[[1]]==7114 & dim(buzztest)[[1]]==791,'is','is not')` the same
+as when this document was prepared.
+
+Notice we have exploded the basic column names into the following:
+```{r colnames}
+print(colnames)
+```
+
+We are now ready to create a simple model predicting "buzz" as function of the
+other columns.
+
+```{r model}
+# build a model
+# let's use all the input variables
+nlist = varnames
+varslist = as.vector(sapply(nlist, FUN=makevars))
+
+# these were defined previously in Practical Data Science with R
+loglikelihood <- function(y, py) {
+  pysmooth <- ifelse(py == 0, 1e-12,
+                     ifelse(py == 1, 1-1e-12, py))
+  sum(y * log(pysmooth) + (1 - y) * log(1 - pysmooth))
+}
+
+accuracyMeasures <- function(pred, truth, threshold=0.5, name="model") {
+  dev.norm <- -2 * loglikelihood(as.numeric(truth), pred) / length(pred)
+  ctable = table(truth = truth,
+                 pred = pred > threshold)
+  accuracy <- sum(diag(ctable)) / sum(ctable)
+  precision <- ctable[2, 2] / sum(ctable[, 2])
+  recall <- ctable[2, 2] / sum(ctable[2, ])
+  f1 <- 2 * precision * recall / (precision + recall)
+  print(paste("precision=", precision, "; recall=" , recall))
+  print(ctable)
+  data.frame(model = name, 
+             accuracy = accuracy, 
+             f1 = f1, 
+             dev.norm = dev.norm,
+             AUC = sigr::calcAUC(pred, truth))
+}
+
+
+library("randomForest")
+bzFormula <- paste('as.factor(buzz) ~ ', paste(varslist, collapse = ' + '))
+fmodel <- randomForest(as.formula(bzFormula),
+                      data = buzztrain,
+                      importance = TRUE)
+
+print('training')
+rtrain <- data.frame(truth = buzztrain$buzz, 
+                     pred = predict(fmodel, newdata = buzztrain, type="prob")[, 2, drop = TRUE])
+print(accuracyMeasures(rtrain$pred, rtrain$truth))
+WVPlots::ROCPlot(rtrain, "pred", "truth", TRUE, "RF train performance, large model")
+
+print('test')
+rtest <- data.frame(truth = buzztest$buzz, 
+                    pred = predict(fmodel, newdata=buzztest, type="prob")[, 2, drop = TRUE])
+print(accuracyMeasures(rtest$pred, rtest$truth))
+WVPlots::ROCPlot(rtest, "pred", "truth", TRUE, "RF train performance, large model")
+```
+
+Notice the extreme fall-off from training to test performance, the random forest
+over fit on training.  We see good accuracy on test (around 92%), but not the 
+perfect fit seen on training.
+
+To try and control the over-fitting we build a new model with the tree
+complexity limited to 50 nodes and the node size to at least 100.
+This is not necessarily a better model (in fact it scores slightly
+poorer on test), but it is one where the training procedure didn't
+have enough freedom to memorize the training data (and therefore maybe
+had better visibility into some trade-offs.
+
+```{r model2}
+fmodel <- randomForest(as.formula(bzFormula),
+                      data = buzztrain,
+                      maxnodes = 50,
+                      nodesize = 100,
+                      importance = TRUE)
+
+print('training')
+rtrain <- data.frame(truth = buzztrain$buzz, 
+                     pred = predict(fmodel, newdata=buzztrain, type="prob")[, 2, drop = TRUE])
+print(accuracyMeasures(rtrain$pred, rtrain$truth))
+
+print('test')
+rtest <- data.frame(truth = buzztest$buzz, 
+                    pred = predict(fmodel, newdata=buzztest, type="prob")[, 2, drop = TRUE])
+print(accuracyMeasures(rtest$pred, rtest$truth))
+```
+
+And we can also make plots.
+
+Training performance:
+
+```{r plottrain}
+WVPlots::ROCPlot(rtrain, "pred", "truth", TRUE, "RF train performance, simpler model")
+```
+
+Test performance:
+
+```{r plottest,}
+WVPlots::ROCPlot(rtest, "pred", "truth", TRUE, "RF test performance, simpler model")
+```
+
+Notice this has similar test performance as the first model.  This
+is typical of random forests: the degree of over-fit in the training data
+is not a good predictor of good or bad performance on test data.
+
+So we are now left with a choice, unfortunately without clear guidance: which model do we use?
+In this case we are going to say: use the simpler model fit on all the data.  The idea
+is the simpler model didn't test much worse and more data lets helps the model reduce over-fitting.
+
+```{r model3}
+# train on all the data
+fmodel <- randomForest(as.formula(bzFormula),
+                      data = buzzdata,
+                      maxnodes = 50,
+                      nodesize = 100,
+                      importance = T)
+```
+
+
+
+
+Save a prepared R environment.
+
+```{r save,message=F,eval=T}
+fname <- 'thRS500.Rdata'
+items <- c("varslist", "fmodel", "buzztrain")
+save(list = items, file = fname)
+message(paste('saved', fname))  # message to running R console
+print(paste('saved', fname))    # print to document
+
+paste('finished at', date())
+system(paste('shasum', fname), intern = TRUE)  # write down file hash
+```
+

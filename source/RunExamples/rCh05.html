@@ -1,0 +1,366 @@
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/c05_Choosing_and_evaluating_models&#39;</span>,
+       <span class="st">&#39;../Spambase&#39;</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  57 Fri Jun 17 10:32:53 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00057_example_5.1_of_section_5.2.1.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.1 of section 5.2.1 
+&gt; # (example 5.1 of section 5.2.1)  : Choosing and evaluating models : Evaluating models : Evaluating classification models 
+&gt; # Title: Building and applying a logistic regression spam model 
+&gt; 
+&gt; spamD &lt;- read.table(&#39;spamD.tsv&#39;,header=T,sep=&#39;\t&#39;)
+
+&gt; spamTrain &lt;- subset(spamD,spamD$rgroup&gt;=10)
+
+&gt; spamTest &lt;- subset(spamD,spamD$rgroup&lt;10)
+
+&gt; spamVars &lt;- setdiff(colnames(spamD),list(&#39;rgroup&#39;,&#39;spam&#39;))
+
+&gt; spamFormula &lt;- as.formula(paste(&#39;spam==&quot;spam&quot;&#39;,
+    paste(spamVars,collapse=&#39; + &#39;),sep=&#39; ~ &#39;))
+
+&gt; spamModel &lt;- glm(spamFormula,family=binomial(link=&#39;logit&#39;),
+    data=spamTrain)
+
+Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+
+&gt; spamTrain$pred &lt;- predict(spamModel,newdata=spamTrain,
+    type=&#39;response&#39;)
+
+&gt; spamTest$pred &lt;- predict(spamModel,newdata=spamTest,
+    type=&#39;response&#39;)
+
+&gt; print(with(spamTest,table(y=spam,glmPred=pred&gt;0.5)))
+          glmPred
+y          FALSE TRUE
+  non-spam   264   14
+  spam        22  158
+
+&gt; ##           glmPred
+&gt; ## y          FALSE TRUE
+&gt; ##   non-spam   264   14
+&gt; ##   spam        22  158
+&gt; 
+[1] &quot;############################### end  57 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  58 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00058_example_5.2_of_section_5.2.1.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.2 of section 5.2.1 
+&gt; # (example 5.2 of section 5.2.1)  : Choosing and evaluating models : Evaluating models : Evaluating classification models 
+&gt; # Title: Spam classifications 
+&gt; 
+&gt; sample &lt;- spamTest[c(7,35,224,327),c(&#39;spam&#39;,&#39;pred&#39;)]
+
+&gt; print(sample)
+         spam         pred
+115      spam 0.9903246227
+361      spam 0.4800498077
+2300 non-spam 0.0006846551
+3428 non-spam 0.0001434345
+
+&gt; ##          spam         pred
+&gt; ## 115      spam 0.9903246227
+&gt; ## 361      spam 0.4800498077
+&gt; ## 2300 non-spam 0.0006846551
+&gt; ## 3428 non-spam 0.0001434345
+&gt; 
+[1] &quot;############################### end  58 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  59 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00059_example_5.3_of_section_5.2.1.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.3 of section 5.2.1 
+&gt; # (example 5.3 of section 5.2.1)  : Choosing and evaluating models : Evaluating models : Evaluating classification models 
+&gt; # Title: Spam confusion matrix 
+&gt; 
+&gt; cM &lt;- table(truth=spamTest$spam,prediction=spamTest$pred&gt;0.5)
+
+&gt; print(cM)
+          prediction
+truth      FALSE TRUE
+  non-spam   264   14
+  spam        22  158
+
+&gt; ##          prediction
+&gt; ## truth      FALSE TRUE
+&gt; ##   non-spam   264   14
+&gt; ##   spam        22  158
+&gt; 
+[1] &quot;############################### end  59 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  60 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00060_example_5.4_of_section_5.2.1.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.4 of section 5.2.1 
+&gt; # (example 5.4 of section 5.2.1)  : Choosing and evaluating models : Evaluating models : Evaluating classification models 
+&gt; # Title: Entering data by hand 
+&gt; 
+&gt; t &lt;- as.table(matrix(data=c(288-1,17,1,13882-17),nrow=2,ncol=2))
+
+&gt; rownames(t) &lt;- rownames(cM)
+
+&gt; colnames(t) &lt;- colnames(cM)
+
+&gt; print(t)
+         FALSE  TRUE
+non-spam   287     1
+spam        17 13865
+
+&gt; ##          FALSE  TRUE
+&gt; ## non-spam   287     1
+&gt; ## spam        17 13865
+&gt; 
+[1] &quot;############################### end  60 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  61 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00061_example_5.5_of_section_5.2.2.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.5 of section 5.2.2 
+&gt; # (example 5.5 of section 5.2.2)  : Choosing and evaluating models : Evaluating models : Evaluating scoring models 
+&gt; # Title: Plotting residuals 
+&gt; 
+&gt; d &lt;- data.frame(y=(1:10)^2,x=1:10)
+
+&gt; model &lt;- lm(y~x,data=d)
+
+&gt; d$prediction &lt;- predict(model,newdata=d)
+
+&gt; library(&#39;ggplot2&#39;)
+
+&gt; ggplot(data=d) + geom_point(aes(x=x,y=y)) +
+     geom_line(aes(x=x,y=prediction),color=&#39;blue&#39;) +
+     geom_segment(aes(x=x,y=prediction,yend=y,xend=x)) +
+     scale_y_continuous(&#39;&#39;)</code></pre>
+<div class="figure">
+<img src="rCh05_files/figure-markdown_github/ch5ex-1.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  61 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  62 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00062_example_5.6_of_section_5.2.3.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.6 of section 5.2.3 
+&gt; # (example 5.6 of section 5.2.3)  : Choosing and evaluating models : Evaluating models : Evaluating probability models 
+&gt; # Title: Making a double density plot 
+&gt; 
+&gt; ggplot(data=spamTest) +
+    geom_density(aes(x=pred,color=spam,linetype=spam))
+
+[1] &quot;############################### end  62 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;############################### start  63 Fri Jun 17 10:32:54 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00063_example_5.7_of_section_5.2.3.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.7 of section 5.2.3 
+&gt; # (example 5.7 of section 5.2.3)  : Choosing and evaluating models : Evaluating models : Evaluating probability models 
+&gt; # Title: Plotting the receiver operating characteristic curve 
+&gt; 
+&gt; library(&#39;ROCR&#39;)
+
+Loading required package: gplots
+
+
+Attaching package: &#39;gplots&#39;
+
+The following object is masked from &#39;package:stats&#39;:
+
+    lowess</code></pre>
+<div class="figure">
+<img src="rCh05_files/figure-markdown_github/ch5ex-2.png" alt="" />
+
+</div>
+<pre><code>&gt; eval &lt;- prediction(spamTest$pred,spamTest$spam)
+
+&gt; plot(performance(eval,&quot;tpr&quot;,&quot;fpr&quot;))</code></pre>
+<div class="figure">
+<img src="rCh05_files/figure-markdown_github/ch5ex-3.png" alt="" />
+
+</div>
+<pre><code>&gt; print(attributes(performance(eval,&#39;auc&#39;))$y.values[[1]])
+[1] 0.9660072
+
+&gt; ## [1] 0.9660072
+&gt; 
+[1] &quot;############################### end  63 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  64 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00064_example_5.8_of_section_5.2.3.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.8 of section 5.2.3 
+&gt; # (example 5.8 of section 5.2.3)  : Choosing and evaluating models : Evaluating models : Evaluating probability models 
+&gt; # Title: Calculating log likelihood 
+&gt; 
+&gt; sum(ifelse(spamTest$spam==&#39;spam&#39;,
+    log(spamTest$pred),
+    log(1-spamTest$pred)))
+[1] -134.9478
+
+&gt; ## [1] -134.9478
+&gt; sum(ifelse(spamTest$spam==&#39;spam&#39;,
+    log(spamTest$pred),
+    log(1-spamTest$pred)))/dim(spamTest)[[1]]
+[1] -0.2946458
+
+&gt; ## [1] -0.2946458
+&gt; 
+[1] &quot;############################### end  64 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  65 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00065_example_5.9_of_section_5.2.3.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.9 of section 5.2.3 
+&gt; # (example 5.9 of section 5.2.3)  : Choosing and evaluating models : Evaluating models : Evaluating probability models 
+&gt; # Title: Computing the null model’s log likelihood 
+&gt; 
+&gt; pNull &lt;- sum(ifelse(spamTest$spam==&#39;spam&#39;,1,0))/dim(spamTest)[[1]]
+
+&gt; sum(ifelse(spamTest$spam==&#39;spam&#39;,1,0))*log(pNull) +
+    sum(ifelse(spamTest$spam==&#39;spam&#39;,0,1))*log(1-pNull)
+[1] -306.8952
+
+&gt; ## [1] -306.8952
+&gt; 
+[1] &quot;############################### end  65 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  66 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00066_example_5.10_of_section_5.2.3.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.10 of section 5.2.3 
+&gt; # (example 5.10 of section 5.2.3)  : Choosing and evaluating models : Evaluating models : Evaluating probability models 
+&gt; # Title: Calculating entropy and conditional entropy 
+&gt; 
+&gt; entropy &lt;- function(x) {  # Note: 1 
+     xpos &lt;- x[x&gt;0]
+     scaled &lt;- xpos/sum(xpos)
+     sum(-scaled*log(scaled,2))
+   }
+
+&gt; print(entropy(table(spamTest$spam)))  # Note: 2 
+[1] 0.9667165
+
+&gt; ## [1] 0.9667165
+&gt; 
+&gt; conditionalEntropy &lt;- function(t) {   # Note: 3 
+     (sum(t[,1])*entropy(t[,1]) + sum(t[,2])*entropy(t[,2]))/sum(t)
+   }
+
+&gt; print(conditionalEntropy(cM))     # Note: 4 
+[1] 0.3971897
+
+&gt; ## [1] 0.3971897
+&gt; 
+&gt; # Note 1: 
+&gt; #   Define function that computes the entropy 
+&gt; #   from list of outcome counts 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Calculate entropy of spam/non-spam 
+&gt; #   distribution 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Function to calculate conditional or 
+&gt; #   remaining entropy of spam distribution (rows) 
+&gt; #   given prediction (columns) 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Calculate conditional or remaining entropy 
+&gt; #   of spam distribution given prediction 
+&gt; 
+[1] &quot;############################### end  66 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  67 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00067_example_5.11_of_section_5.2.5.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.11 of section 5.2.5 
+&gt; # (example 5.11 of section 5.2.5)  : Choosing and evaluating models : Evaluating models : Evaluating clustering models 
+&gt; # Title: Clustering random data in the plane 
+&gt; 
+&gt; set.seed(32297)
+
+&gt; d &lt;- data.frame(x=runif(100),y=runif(100))
+
+&gt; clus &lt;- kmeans(d,centers=5)
+
+&gt; d$cluster &lt;- clus$cluster
+[1] &quot;############################### end  67 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  68 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00068_example_5.12_of_section_5.2.5.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.12 of section 5.2.5 
+&gt; # (example 5.12 of section 5.2.5)  : Choosing and evaluating models : Evaluating models : Evaluating clustering models 
+&gt; # Title: Plotting our clusters 
+&gt; 
+&gt; library(&#39;ggplot2&#39;); library(&#39;grDevices&#39;)
+
+&gt; h &lt;- do.call(rbind,
+    lapply(unique(clus$cluster),
+       function(c) { f &lt;- subset(d,cluster==c); f[chull(f),]}))
+
+&gt; ggplot() +
+  geom_text(data=d,aes(label=cluster,x=x,y=y,
+    color=cluster),size=3)  +
+  geom_polygon(data=h,aes(x=x,y=y,group=cluster,fill=as.factor(cluster)),
+    alpha=0.4,linetype=0) +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<div class="figure">
+<img src="rCh05_files/figure-markdown_github/ch5ex-4.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  68 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  69 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00069_example_5.13_of_section_5.2.5.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.13 of section 5.2.5 
+&gt; # (example 5.13 of section 5.2.5)  : Choosing and evaluating models : Evaluating models : Evaluating clustering models 
+&gt; # Title: Calculating the size of each cluster 
+&gt; 
+&gt; table(d$cluster)
+
+ 1  2  3  4  5 
+10 27 18 17 28 
+
+&gt; ##  1  2  3  4  5
+&gt; ## 10 27 18 17 28
+&gt; 
+[1] &quot;############################### end  69 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;############################### start  70 Fri Jun 17 10:32:55 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c05_Choosing_and_evaluating_models/00070_example_5.14_of_section_5.2.5.R&quot;
+[1] &quot;#####   in directory ../Spambase&quot;
+
+&gt; # example 5.14 of section 5.2.5 
+&gt; # (example 5.14 of section 5.2.5)  : Choosing and evaluating models : Evaluating models : Evaluating clustering models 
+&gt; # Title: Calculating the typical distance between items in every pair of clusters 
+&gt; 
+&gt; library(&#39;reshape2&#39;)
+
+&gt; n &lt;- dim(d)[[1]]
+
+&gt; pairs &lt;- data.frame(
+    ca = as.vector(outer(1:n,1:n,function(a,b) d[a,&#39;cluster&#39;])),
+    cb = as.vector(outer(1:n,1:n,function(a,b) d[b,&#39;cluster&#39;])),
+    dist = as.vector(outer(1:n,1:n,function(a,b)
+            sqrt((d[a,&#39;x&#39;]-d[b,&#39;x&#39;])^2 + (d[a,&#39;y&#39;]-d[b,&#39;y&#39;])^2)))
+    )
+
+&gt; dcast(pairs,ca~cb,value.var=&#39;dist&#39;,mean)
+  ca         1         2         3         4         5
+1  1 0.1478480 0.6524103 0.3780785 0.4404508 0.7544134
+2  2 0.6524103 0.2794181 0.5551967 0.4990632 0.5165320
+3  3 0.3780785 0.5551967 0.2031272 0.6122986 0.4656730
+4  4 0.4404508 0.4990632 0.6122986 0.2048268 0.8365336
+5  5 0.7544134 0.5165320 0.4656730 0.8365336 0.2221314
+
+&gt; ##   ca         1         2         3         4         5
+&gt; ## 1  1 0.1478480 0.6524103 0.3780785 0.4404508 0.7544134
+&gt; ## 2  2 0.6524103 0.2794181 0.5551967 0.4990632 0.5165320
+&gt; ## 3  3 0.3780785 0.5551967 0.2031272 0.6122986 0.4656730
+&gt; ## 4  4 0.4404508 0.4990632 0.6122986 0.2048268 0.8365336
+&gt; ## 5  5 0.7544134 0.5165320 0.4656730 0.8365336 0.2221314
+&gt; 
+[1] &quot;############################### end  70 Fri Jun 17 10:32:55 2016&quot;</code></pre>

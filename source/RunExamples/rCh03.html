@@ -1,0 +1,720 @@
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">custdata &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&#39;../Custdata/custdata.tsv&#39;</span>,
+                       <span class="dt">header=</span><span class="ot">TRUE</span>,<span class="dt">sep=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>)
+<span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/c03_Exploring_data&#39;</span>,
+       <span class="st">&#39;../Custdata&#39;</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  20 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00020_example_3.1_of_section_3.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.1 of section 3.1 
+&gt; # (example 3.1 of section 3.1)  : Exploring data : Using summary statistics to spot problems 
+&gt; # Title: The summary() command 
+&gt; 
+&gt; custdata &lt;- read.table(&#39;custdata.tsv&#39;,
+    header=TRUE,sep=&#39;\t&#39;)
+
+&gt; summary(custdata)
+     custid        sex     is.employed         income      
+ Min.   :   2068   F:440   Mode :logical   Min.   : -8700  
+ 1st Qu.: 345667   M:560   FALSE:73        1st Qu.: 14600  
+ Median : 693403           TRUE :599       Median : 35000  
+ Mean   : 698500           NA&#39;s :328       Mean   : 53505  
+ 3rd Qu.:1044606                           3rd Qu.: 67000  
+ Max.   :1414286                           Max.   :615000  
+                                                           
+             marital.stat health.ins     
+ Divorced/Separated:155   Mode :logical  
+ Married           :516   FALSE:159      
+ Never Married     :233   TRUE :841      
+ Widowed           : 96   NA&#39;s :0        
+                                         
+                                         
+                                         
+                       housing.type recent.move      num.vehicles  
+ Homeowner free and clear    :157   Mode :logical   Min.   :0.000  
+ Homeowner with mortgage/loan:412   FALSE:820       1st Qu.:1.000  
+ Occupied with no rent       : 11   TRUE :124       Median :2.000  
+ Rented                      :364   NA&#39;s :56        Mean   :1.916  
+ NA&#39;s                        : 56                   3rd Qu.:2.000  
+                                                    Max.   :6.000  
+                                                    NA&#39;s   :56     
+      age              state.of.res
+ Min.   :  0.0   California  :100  
+ 1st Qu.: 38.0   New York    : 71  
+ Median : 50.0   Pennsylvania: 70  
+ Mean   : 51.7   Texas       : 56  
+ 3rd Qu.: 64.0   Michigan    : 52  
+ Max.   :146.7   Ohio        : 51  
+                 (Other)     :600  
+
+&gt; ## custid        sex
+&gt; ## Min.   :   2068   F:440
+&gt; ## 1st Qu.: 345667   M:560
+&gt; ## Median : 693403
+&gt; ## Mean   : 698500
+&gt; ## 3rd Qu.:1044606
+&gt; ## Max.   :1414286
+&gt; ##
+&gt; ## is.employed         income         # Note: 1 
+&gt; ## Mode :logical   Min.   : -8700
+&gt; ## FALSE:73        1st Qu.: 14600
+&gt; ## TRUE :599       Median : 35000
+&gt; ## NA&#39;s :328       Mean   : 53505
+&gt; ##                 3rd Qu.: 67000
+&gt; ##                 Max.   :615000
+&gt; ##
+&gt; ## marital.stat
+&gt; ## Divorced/Separated:155
+&gt; ## Married           :516
+&gt; ## Never Married     :233
+&gt; ## Widowed           : 96
+&gt; ##
+&gt; ## health.ins                     # Note: 2 
+&gt; ## Mode :logical
+&gt; ## FALSE:159
+&gt; ## TRUE :841
+&gt; ## NA&#39;s :0
+&gt; ##
+&gt; ## housing.type                           # Note: 3 
+&gt; ## Homeowner free and clear    :157
+&gt; ## Homeowner with mortgage/loan:412
+&gt; ## Occupied with no rent       : 11
+&gt; ## Rented                      :364
+&gt; ## NA&#39;s                        : 56
+&gt; ##
+&gt; ## recent.move      num.vehicles
+&gt; ## Mode :logical   Min.   :0.000
+&gt; ## FALSE:820       1st Qu.:1.000
+&gt; ## TRUE :124       Median :2.000
+&gt; ## NA&#39;s :56        Mean   :1.916
+&gt; ##                 3rd Qu.:2.000
+&gt; ##                 Max.   :6.000
+&gt; ##                 NA&#39;s   :56
+&gt; ##
+&gt; ## age              state.of.res          # Note: 4 
+&gt; ## Min.   :  0.0   California  :100
+&gt; ## 1st Qu.: 38.0   New York    : 71
+&gt; ## Median : 50.0   Pennsylvania: 70
+&gt; ## Mean   : 51.7   Texas       : 56
+&gt; ## 3rd Qu.: 64.0   Michigan    : 52
+&gt; ## Max.   :146.7   Ohio        : 51
+&gt; ##                 (Other)     :600
+&gt; 
+&gt; # Note 1: 
+&gt; #   The variable is.employed is missing for 
+&gt; #   about a third of the data. The variable income has negative values, which are 
+&gt; #   potentially invalid. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   About 84% of the customers have health 
+&gt; #   insurance. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   The variables housing.type, recent.move, and 
+&gt; #   num.vehicles are each missing 56 values. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   The average value of the variable age seems 
+&gt; #   plausible, but the minimum and maximum values seem unlikely. The variable 
+&gt; #   state.of.res is a categorical variable; summary() reports how many customers are in 
+&gt; #   each state (for the first few states). 
+&gt; 
+[1] &quot;############################### end  20 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;############################### start  22 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00022_example_3.3_of_section_3.1.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.3 of section 3.1.1 
+&gt; # (example 3.3 of section 3.1.1)  : Exploring data : Using summary statistics to spot problems : Typical problems revealed by data summaries 
+&gt; # Title: Examples of invalid values and outliers 
+&gt; 
+&gt; summary(custdata$income)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  -8700   14600   35000   53500   67000  615000 
+
+&gt; ##    Min. 1st Qu.  Median    Mean 3rd Qu.
+&gt; ##   -8700   14600   35000   53500   67000    # Note: 1 
+&gt; ##    Max.
+&gt; ##  615000
+&gt; 
+&gt; summary(custdata$age)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    0.0    38.0    50.0    51.7    64.0   146.7 
+
+&gt; ##    Min. 1st Qu.  Median    Mean 3rd Qu.
+&gt; ##     0.0    38.0    50.0    51.7    64.0    # Note: 2 
+&gt; ##    Max.
+&gt; ##   146.7
+&gt; 
+&gt; # Note 1: 
+&gt; #   Negative values for income could indicate 
+&gt; #   bad data. They might also have a special meaning, like “amount of 
+&gt; #   debt.” Either way, you should check how prevalent the issue is, 
+&gt; #   and decide what to do: Do you drop the data with negative income? Do you 
+&gt; #   convert negative values to zero? 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Customers of age zero, or customers of an 
+&gt; #   age greater than about 110 are outliers. They fall out of the range of 
+&gt; #   expected customer values. Outliers could be data input errors. 
+&gt; #   They could be special sentinel values: zero might mean “age unknown” or 
+&gt; #   “refuse to state.” And some of your customers might be especially 
+&gt; #   long-lived. 
+&gt; 
+[1] &quot;############################### end  22 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;############################### start  23 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00023_example_3.4_of_section_3.1.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.4 of section 3.1.1 
+&gt; # (example 3.4 of section 3.1.1)  : Exploring data : Using summary statistics to spot problems : Typical problems revealed by data summaries 
+&gt; # Title: Looking at the data range of a variable 
+&gt; 
+&gt; summary(custdata$income)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  -8700   14600   35000   53500   67000  615000 
+
+&gt; ##    Min. 1st Qu.  Median    Mean 3rd Qu.
+&gt; ##   -8700   14600   35000   53500   67000    # Note: 1 
+&gt; ##    Max.
+&gt; ##  615000
+&gt; 
+&gt; # Note 1: 
+&gt; #   Income ranges from zero to over half a million 
+&gt; #   dollars; a very wide range. 
+&gt; 
+[1] &quot;############################### end  23 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;############################### start  24 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00024_example_3.5_of_section_3.1.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.5 of section 3.1.1 
+&gt; # (example 3.5 of section 3.1.1)  : Exploring data : Using summary statistics to spot problems : Typical problems revealed by data summaries 
+&gt; # Title: Checking units sounds silly, but mistakes can lead to spectacular errors if not caught 
+&gt; 
+&gt; Income = custdata$income/1000
+
+&gt; summary(Income)                                   # Note: 1 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   -8.7    14.6    35.0    53.5    67.0   615.0 
+
+&gt; ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+&gt; ##    -8.7    14.6    35.0    53.5    67.0   615.0
+&gt; 
+&gt; # Note 1: 
+&gt; #   The variable Income is defined as Income = custdata$income/1000. But suppose you didn’t know 
+&gt; #   that. Looking only at the summary, the values could plausibly be 
+&gt; #   interpreted to mean either “hourly wage” or “yearly income in units 
+&gt; #   of $1000.” 
+&gt; 
+[1] &quot;############################### end  24 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;############################### start  25 Fri Jun 17 10:32:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00025_example_3.6_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.6 of section 3.2.1 
+&gt; # (example 3.6 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; # Title: Plotting a histogram 
+&gt; 
+&gt; library(ggplot2)      # Note: 1 
+
+&gt; ggplot(custdata) +
+    geom_histogram(aes(x=age),
+    binwidth=5, fill=&quot;gray&quot;)    # Note: 2</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-1.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Load the ggplot2 library, if you haven’t 
+&gt; #   already done so. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   binwidth parameterThe binwidth parameter tells the 
+&gt; #   geom_histogram call how to make bins of five-year intervals (default is 
+&gt; #   datarange/30). The fill parameter specifies the color of the histogram 
+&gt; #   bars (default: black). 
+&gt; 
+[1] &quot;############################### end  25 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;############################### start  26 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00026_example_3.7_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.7 of section 3.2.1 
+&gt; # (example 3.7 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; # Title: Producing a density plot 
+&gt; 
+&gt; library(scales)   # Note: 1 
+
+&gt; ggplot(custdata) + geom_density(aes(x=income)) +
+    scale_x_continuous(labels=dollar)   # Note: 2</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-2.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   The scales package brings in the dollar 
+&gt; #   scale notation. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Set the x-axis labels to 
+&gt; #   dollars. 
+&gt; 
+[1] &quot;############################### end  26 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;############################### start  27 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00027_example_3.8_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.8 of section 3.2.1 
+&gt; # (example 3.8 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; # Title: Creating a log-scaled density plot 
+&gt; 
+&gt; ggplot(custdata) + geom_density(aes(x=income)) +
+    scale_x_log10(breaks=c(100,1000,10000,100000), labels=dollar) +     # Note: 1 
+    annotation_logticks(sides=&quot;bt&quot;)     # Note: 2
+
+Warning in self$trans$transform(x): NaNs produced
+
+Warning: Removed 79 rows containing non-finite values (stat_density).</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-3.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Set the x-axis to be in log10 scale, with 
+&gt; #   manually set tick points and labels as dollars. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Add log-scaled tick marks to the top and 
+&gt; #   bottom of the graph. 
+&gt; 
+[1] &quot;############################### end  27 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;############################### start  29 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00029_informalexample_3.2_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # informalexample 3.2 of section 3.2.1 
+&gt; # (informalexample 3.2 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; 
+&gt; ggplot(custdata) + geom_bar(aes(x=marital.stat), fill=&quot;gray&quot;)</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-4.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  29 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;############################### start  30 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00030_example_3.9_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.9 of section 3.2.1 
+&gt; # (example 3.9 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; # Title: Producing a horizontal bar chart 
+&gt; 
+&gt; ggplot(custdata) +
+    geom_bar(aes(x=state.of.res), fill=&quot;gray&quot;) +    # Note: 1 
+    coord_flip() +  # Note: 2 
+    theme(axis.text.y=element_text(size=rel(0.8)))      # Note: 3</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-5.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Plot bar chart as before: state.of.res 
+&gt; #   is on x axis, count is on y-axis. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Flip the x and y axes: state.of.res is 
+&gt; #   now on the y-axis. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Reduce the size of the y-axis tick 
+&gt; #   labels to 80% of default size for legibility. 
+&gt; 
+[1] &quot;############################### end  30 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;############################### start  31 Fri Jun 17 10:32:37 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00031_example_3.10_of_section_3.2.1.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.10 of section 3.2.1 
+&gt; # (example 3.10 of section 3.2.1)  : Exploring data : Spotting problems using graphics and visualization : Visually checking distributions for a single variable 
+&gt; # Title: Producing a bar chart with sorted categories 
+&gt; 
+&gt; statesums &lt;- table(custdata$state.of.res)     # Note: 1 
+
+&gt; statef &lt;- as.data.frame(statesums)    # Note: 2 
+
+&gt; colnames(statef)&lt;-c(&quot;state.of.res&quot;, &quot;count&quot;)  # Note: 3 
+
+&gt; summary(statef)   # Note: 4 
+     state.of.res     count       
+ Alabama   : 1    Min.   :  1.00  
+ Alaska    : 1    1st Qu.:  5.00  
+ Arizona   : 1    Median : 12.00  
+ Arkansas  : 1    Mean   : 20.00  
+ California: 1    3rd Qu.: 26.25  
+ Colorado  : 1    Max.   :100.00  
+ (Other)   :44                    
+
+&gt; ## state.of.res     count
+&gt; ## Alabama   : 1    Min.   :  1.00
+&gt; ## Alaska    : 1    1st Qu.:  5.00
+&gt; ## Arizona   : 1    Median : 12.00
+&gt; ## Arkansas  : 1    Mean   : 20.00
+&gt; ## California: 1    3rd Qu.: 26.25
+&gt; ## Colorado  : 1    Max.   :100.00
+&gt; ## (Other)   :44
+&gt; statef &lt;- transform(statef,
+    state.of.res=reorder(state.of.res, count))  # Note: 5 
+
+&gt; summary(statef)                           # Note: 6 
+       state.of.res     count       
+ Delaware    : 1    Min.   :  1.00  
+ North Dakota: 1    1st Qu.:  5.00  
+ Wyoming     : 1    Median : 12.00  
+ Rhode Island: 1    Mean   : 20.00  
+ Alaska      : 1    3rd Qu.: 26.25  
+ Montana     : 1    Max.   :100.00  
+ (Other)     :44                    
+
+&gt; ## state.of.res     count
+&gt; ## Delaware    : 1    Min.   :  1.00
+&gt; ## North Dakota: 1    1st Qu.:  5.00
+&gt; ## Wyoming     : 1    Median : 12.00
+&gt; ## Rhode Island: 1    Mean   : 20.00
+&gt; ## Alaska      : 1    3rd Qu.: 26.25
+&gt; ## Montana     : 1    Max.   :100.00
+&gt; ## (Other)     :44
+&gt; ggplot(statef)+ geom_bar(aes(x=state.of.res,y=count),
+    stat=&quot;identity&quot;,                # Note: 7 
+    fill=&quot;gray&quot;) +
+    coord_flip() +                                          # Note: 8 
+    theme(axis.text.y=element_text(size=rel(0.8)))</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-6.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   The table() command aggregates the data by state of residence—exactly the information the bar 
+&gt; #   chart plots. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Convert the table to a data frame. The default column names are Var1 and Freq. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Rename the columns for readability. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Notice that the default ordering for the 
+&gt; #   state.of.res variable is alphabetical. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Use the reorder() function to set the 
+&gt; #   state.of.res variable to be count ordered. Use the transform() function 
+&gt; #   to apply the transformation to the state.of.res data frame. 
+&gt; 
+&gt; # Note 6: 
+&gt; #   The state.of.res variable is now count 
+&gt; #   ordered. 
+&gt; 
+&gt; # Note 7: 
+&gt; #   Since the data is being passed to 
+&gt; #   geom_bar pre-aggregated, specify both the x and 
+&gt; #   y variables, and use stat=&quot;identity&quot; to plot the 
+&gt; #   data exactly as given. 
+&gt; 
+&gt; # Note 8: 
+&gt; #   Flip the axes and reduce the size of the 
+&gt; #   label text as before. 
+&gt; 
+[1] &quot;############################### end  31 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  32 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00032_example_3.11_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.11 of section 3.2.2 
+&gt; # (example 3.11 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Producing a line plot 
+&gt; 
+&gt; x &lt;- runif(100)       # Note: 1 
+
+&gt; y &lt;- x^2 + 0.2*x      # Note: 2 
+
+&gt; ggplot(data.frame(x=x,y=y), aes(x=x,y=y)) + geom_line()   # Note: 3</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-7.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   First, generate the data for this example. 
+&gt; #   The x variable is uniformly randomly distributed 
+&gt; #   between 0 and 1. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   The y variable is a 
+&gt; #   quadratic function of x. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Plot the line plot. 
+&gt; 
+[1] &quot;############################### end  32 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  33 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00033_example_3.12_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.12 of section 3.2.2 
+&gt; # (example 3.12 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Examining the correlation between age and income 
+&gt; 
+&gt; custdata2 &lt;- subset(custdata,
+    (custdata$age &gt; 0 &amp; custdata$age &lt; 100
+    &amp; custdata$income &gt; 0))                     # Note: 1 
+
+&gt; cor(custdata2$age, custdata2$income)  # Note: 2 
+[1] -0.02240845
+
+&gt; ## [1] -0.02240845    # Note: 3
+&gt; 
+&gt; # Note 1: 
+&gt; #   Only consider a subset of data with 
+&gt; #   reasonable age and income values. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Get correlation of age and income. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Resulting correlation. 
+&gt; 
+[1] &quot;############################### end  33 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  34 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00034_informalexample_3.3_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # informalexample 3.3 of section 3.2.2 
+&gt; # (informalexample 3.3 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; 
+&gt; ggplot(custdata2, aes(x=age, y=income)) +
+    geom_point() + ylim(0, 200000)
+
+Warning: Removed 32 rows containing missing values (geom_point).</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-8.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  34 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  35 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00035_informalexample_3.4_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # informalexample 3.4 of section 3.2.2 
+&gt; # (informalexample 3.4 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; 
+&gt; ggplot(custdata2, aes(x=age, y=income)) + geom_point() +
+   stat_smooth(method=&quot;lm&quot;) +
+   ylim(0, 200000)
+
+Warning: Removed 32 rows containing non-finite values (stat_smooth).
+
+Warning: Removed 32 rows containing missing values (geom_point).</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-9.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  35 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  36 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00036_informalexample_3.5_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # informalexample 3.5 of section 3.2.2 
+&gt; # (informalexample 3.5 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; 
+&gt; ggplot(custdata2, aes(x=age, y=income)) +
+    geom_point() + geom_smooth() +
+    ylim(0, 200000)
+
+Warning: Removed 32 rows containing non-finite values (stat_smooth).
+
+Warning: Removed 32 rows containing missing values (geom_point).</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-10.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  36 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;############################### start  37 Fri Jun 17 10:32:38 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00037_example_3.13_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.13 of section 3.2.2 
+&gt; # (example 3.13 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Plotting the distribution of health.ins as a function of age 
+&gt; 
+&gt; ggplot(custdata2, aes(x=age, y=as.numeric(health.ins))) +     # Note: 1 
+    geom_point(position=position_jitter(w=0.05, h=0.05)) +      # Note: 2 
+    geom_smooth()   # Note: 3</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-11.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   The Boolean variable health.ins must be 
+&gt; #   converted to a 0/1 variable using as.numeric. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Since y values can 
+&gt; #   only be 0 or 1, add a small jitter to get a sense of data 
+&gt; #   density. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Add smoothing curve. 
+&gt; 
+[1] &quot;############################### end  37 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;############################### start  38 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00038_example_3.14_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.14 of section 3.2.2 
+&gt; # (example 3.14 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Producing a hexbin plot 
+&gt; 
+&gt; library(hexbin)   # Note: 1 
+
+&gt; ggplot(custdata2, aes(x=age, y=income)) +
+    geom_hex(binwidth=c(5, 10000)) +    # Note: 2 
+    geom_smooth(color=&quot;white&quot;, se=F) +      # Note: 3 
+    ylim(0,200000)
+
+Warning: Removed 32 rows containing non-finite values (stat_binhex).
+
+Warning: Removed 32 rows containing non-finite values (stat_smooth).
+
+Warning: Removed 13 rows containing missing values (geom_hex).</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-12.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Load hexbin library. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Create hexbin with age binned into 5-year 
+&gt; #   increments, income in increments of $10,000. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Add smoothing curve in white; suppress 
+&gt; #   standard error ribbon (se=F). 
+&gt; 
+[1] &quot;############################### end  38 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;############################### start  39 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00039_example_3.15_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.15 of section 3.2.2 
+&gt; # (example 3.15 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Specifying different styles of bar chart 
+&gt; 
+&gt; ggplot(custdata) + geom_bar(aes(x=marital.stat,
+    fill=health.ins))   # Note: 1 </code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-13.png" alt="" />
+
+</div>
+<pre><code>&gt; ggplot(custdata) + geom_bar(aes(x=marital.stat,
+    fill=health.ins),
+    position=&quot;dodge&quot;)       # Note: 2 </code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-14.png" alt="" />
+
+</div>
+<pre><code>&gt; ggplot(custdata) + geom_bar(aes(x=marital.stat,
+    fill=health.ins),
+    position=&quot;fill&quot;)            # Note: 3</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-15.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Stacked bar chart, the 
+&gt; #   default 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Side-by-side bar chart 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Filled bar chart 
+&gt; 
+[1] &quot;############################### end  39 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;############################### start  40 Fri Jun 17 10:32:39 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00040_example_3.16_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.16 of section 3.2.2 
+&gt; # (example 3.16 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Plotting data with a rug 
+&gt; 
+&gt; ggplot(custdata, aes(x=marital.stat)) +
+    geom_bar(aes(fill=health.ins), position=&quot;fill&quot;) +
+    geom_point(aes(y=-0.05), size=0.75, alpha=0.3,  # Note: 1 
+    position=position_jitter(h=0.01))   # Note: 2</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-16.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Set the points just under the y-axis, 
+&gt; #   three-quarters of default size, and make them slightly transparent with 
+&gt; #   the alpha parameter. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Jitter the points slightly for 
+&gt; #   legibility. 
+&gt; 
+[1] &quot;############################### end  40 Fri Jun 17 10:32:40 2016&quot;
+[1] &quot;############################### start  41 Fri Jun 17 10:32:40 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c03_Exploring_data/00041_example_3.17_of_section_3.2.2.R&quot;
+[1] &quot;#####   in directory ../Custdata&quot;
+
+&gt; # example 3.17 of section 3.2.2 
+&gt; # (example 3.17 of section 3.2.2)  : Exploring data : Spotting problems using graphics and visualization : Visually checking relationships between two variables 
+&gt; # Title: Plotting a bar chart with and without facets 
+&gt; 
+&gt; ggplot(custdata2) +                                           # Note: 1 
+    geom_bar(aes(x=housing.type, fill=marital.stat ),
+       position=&quot;dodge&quot;) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))    # Note: 2 </code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-17.png" alt="" />
+
+</div>
+<pre><code>&gt; ggplot(custdata2) +                                           # Note: 3 
+    geom_bar(aes(x=marital.stat), position=&quot;dodge&quot;,
+       fill=&quot;darkgray&quot;) +
+    facet_wrap(~housing.type, scales=&quot;free_y&quot;) +                # Note: 4 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))    # Note: 5</code></pre>
+<div class="figure">
+<img src="rCh03_files/figure-markdown_github/ch3ex-18.png" alt="" />
+
+</div>
+<pre><code>&gt; # Note 1: 
+&gt; #   Side-by-side bar chart. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   coord_flip commandTilt the x-axis labels so they 
+&gt; #   don’t overlap. You can also use coord_flip() to rotate the graph, as we 
+&gt; #   saw previously. Some prefer coord_flip() because the theme() layer is 
+&gt; #   complicated to use. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   The faceted bar chart. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Facet the graph by housing.type. The scales=&quot;free_y&quot; argument specifies that each facet has 
+&gt; #   an independently scaled y-axis (the default is that all facets have 
+&gt; #   the same scales on both axes). The argument free_x would free the 
+&gt; #   x-axis scaling, and the argument free frees both axes. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   As of this writing, 
+&gt; #   facet_wrap is incompatible with coord_flip, so we have to tilt the 
+&gt; #   x-axis labels. 
+&gt; 
+[1] &quot;############################### end  41 Fri Jun 17 10:32:40 2016&quot;</code></pre>

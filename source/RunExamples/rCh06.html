@@ -1,0 +1,960 @@
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/c06_Memorization_methods&#39;</span>,
+      <span class="st">&#39;../KDD2009&#39;</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  71 Mon Nov  7 20:19:12 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00071_example_6.1_of_section_6.1.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.1 of section 6.1.1 
+&gt; # (example 6.1 of section 6.1.1)  : Memorization methods : KDD and KDD Cup 2009 : Getting started with KDD Cup 2009 data 
+&gt; # Title: Preparing the KDD data for analysis 
+&gt; 
+&gt; d &lt;- read.table(&#39;orange_small_train.data.gz&#39;,     # Note: 1 
+    header=T,
+    sep=&#39;\t&#39;,
+    na.strings=c(&#39;NA&#39;,&#39;&#39;))  # Note: 2 
+
+&gt; churn &lt;- read.table(&#39;orange_small_train_churn.labels.txt&#39;,
+    header=F,sep=&#39;\t&#39;)  # Note: 3 
+
+&gt; d$churn &lt;- churn$V1   # Note: 4 
+
+&gt; appetency &lt;- read.table(&#39;orange_small_train_appetency.labels.txt&#39;,
+    header=F,sep=&#39;\t&#39;)
+
+&gt; d$appetency &lt;- appetency$V1   # Note: 5 
+
+&gt; upselling &lt;- read.table(&#39;orange_small_train_upselling.labels.txt&#39;,
+    header=F,sep=&#39;\t&#39;)
+
+&gt; d$upselling &lt;- upselling$V1   # Note: 6 
+
+&gt; set.seed(729375)  # Note: 7 
+
+&gt; d$rgroup &lt;- runif(dim(d)[[1]])
+
+&gt; dTrainAll &lt;- subset(d,rgroup&lt;=0.9)
+
+&gt; dTest &lt;- subset(d,rgroup&gt;0.9)     # Note: 8 
+
+&gt; outcomes=c(&#39;churn&#39;,&#39;appetency&#39;,&#39;upselling&#39;)
+
+&gt; vars &lt;- setdiff(colnames(dTrainAll),
+    c(outcomes,&#39;rgroup&#39;))
+
+&gt; catVars &lt;- vars[sapply(dTrainAll[,vars],class) %in%
+    c(&#39;factor&#39;,&#39;character&#39;)]    # Note: 9 
+
+&gt; numericVars &lt;- vars[sapply(dTrainAll[,vars],class) %in%
+    c(&#39;numeric&#39;,&#39;integer&#39;)]     # Note: 10 
+
+&gt; rm(list=c(&#39;d&#39;,&#39;churn&#39;,&#39;appetency&#39;,&#39;upselling&#39;))   # Note: 11 
+
+&gt; outcome &lt;- &#39;churn&#39;    # Note: 12 
+
+&gt; pos &lt;- &#39;1&#39;    # Note: 13 
+
+&gt; useForCal &lt;- rbinom(n=dim(dTrainAll)[[1]],size=1,prob=0.1)&gt;0  # Note: 14 
+
+&gt; dCal &lt;- subset(dTrainAll,useForCal)
+
+&gt; dTrain &lt;- subset(dTrainAll,!useForCal)
+
+&gt; # Note 1: 
+&gt; #   Read the file of independent variables. All 
+&gt; #   data from 
+&gt; #   https://github.com/WinVector/zmPDSwR/tree/master/KDD2009. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Treat both NA and the empty string as missing 
+&gt; #   data. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Read churn dependent variable. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Add churn as a new column. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Add appetency as a new column. 
+&gt; 
+&gt; # Note 6: 
+&gt; #   Add upselling as a new column. 
+&gt; 
+&gt; # Note 7: 
+&gt; #   By setting the seed to the pseudo-random 
+&gt; #   number generator, we make our work reproducible: 
+&gt; #   someone redoing it will see the exact same 
+&gt; #   results. 
+&gt; 
+&gt; # Note 8: 
+&gt; #   Split data into train and test subsets. 
+&gt; 
+&gt; # Note 9: 
+&gt; #   Identify which features are categorical 
+&gt; #   variables. 
+&gt; 
+&gt; # Note 10: 
+&gt; #   Identify which features are numeric 
+&gt; #   variables. 
+&gt; 
+&gt; # Note 11: 
+&gt; #   Remove unneeded objects from workspace. 
+&gt; 
+&gt; # Note 12: 
+&gt; #   Choose which outcome to model (churn). 
+&gt; 
+&gt; # Note 13: 
+&gt; #   Choose which outcome is considered 
+&gt; #   positive. 
+&gt; 
+&gt; # Note 14: 
+&gt; #   Further split training data into training and 
+&gt; #   calibration. 
+&gt; 
+[1] &quot;############################### end  71 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;############################### start  72 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00072_example_6.2_of_section_6.2.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.2 of section 6.2.1 
+&gt; # (example 6.2 of section 6.2.1)  : Memorization methods : Building single-variable models : Using categorical features 
+&gt; # Title: Plotting churn grouped by variable 218 levels 
+&gt; 
+&gt; table218 &lt;- table(
+    Var218=dTrain[,&#39;Var218&#39;],   # Note: 1 
+    churn=dTrain[,outcome],     # Note: 2 
+    useNA=&#39;ifany&#39;)  # Note: 3 
+
+&gt; print(table218)
+      churn
+Var218    -1     1
+  cJvF 19245  1220
+  UYBR 17860  1618
+  &lt;NA&gt;   423   152
+
+&gt; ##       churn
+&gt; ## Var218    -1     1
+&gt; ##   cJvF 19245  1220
+&gt; ##   UYBR 17860  1618
+&gt; ##   &lt;NA&gt;   423   152
+&gt; # Note this listing was updated: 10-14-2014 as some of results in the book were
+&gt; # accidentally from older code.  Will update later listings as we go forward.
+&gt; 
+&gt; # Note 1: 
+&gt; #   Tabulate levels of Var218. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Tabulate levels of churn outcome. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Include NA values in tabulation. 
+&gt; 
+[1] &quot;############################### end  72 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;############################### start  73 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00073_example_6.3_of_section_6.2.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.3 of section 6.2.1 
+&gt; # (example 6.3 of section 6.2.1)  : Memorization methods : Building single-variable models : Using categorical features 
+&gt; # Title: Churn rates grouped by variable 218 codes 
+&gt; 
+&gt; print(table218[,2]/(table218[,1]+table218[,2]))
+      cJvF       UYBR       &lt;NA&gt; 
+0.05961398 0.08306808 0.26434783 
+
+&gt; ##       cJvF       UYBR       &lt;NA&gt;
+&gt; ## 0.05994389 0.08223821 0.26523297
+&gt; 
+[1] &quot;############################### end  73 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;############################### start  74 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00074_example_6.4_of_section_6.2.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.4 of section 6.2.1 
+&gt; # (example 6.4 of section 6.2.1)  : Memorization methods : Building single-variable models : Using categorical features 
+&gt; # Title: Function to build single-variable models for categorical variables 
+&gt; 
+&gt; mkPredC &lt;- function(outCol,varCol,appCol) {   # Note: 1 
+    pPos &lt;- sum(outCol==pos)/length(outCol)     # Note: 2 
+    naTab &lt;- table(as.factor(outCol[is.na(varCol)]))
+    pPosWna &lt;- (naTab/sum(naTab))[as.character(pos)]    # Note: 3 
+    vTab &lt;- table(as.factor(outCol),varCol)
+    pPosWv &lt;- (vTab[as.character(pos),]+1.0e-3*pPos)/(colSums(vTab)+1.0e-3)     # Note: 4 
+    pred &lt;- pPosWv[appCol]  # Note: 5 
+    pred[is.na(appCol)] &lt;- pPosWna  # Note: 6 
+    pred[is.na(pred)] &lt;- pPos   # Note: 7 
+    pred    # Note: 8 
+ }
+
+&gt; # Note 1: 
+&gt; #   Given a vector of training outcomes (outCol), 
+&gt; #   a categorical training variable (varCol), and a 
+&gt; #   prediction variable (appCol), use outCol and 
+&gt; #   varCol to build a single-variable model and then 
+&gt; #   apply the model to appCol to get new 
+&gt; #   predictions. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Get stats on how often outcome is positive 
+&gt; #   during training. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Get stats on how often outcome is positive for 
+&gt; #   NA values of variable during training. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Get stats on how often outcome is positive, 
+&gt; #   conditioned on levels of training variable. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Make predictions by looking up levels of 
+&gt; #   appCol. 
+&gt; 
+&gt; # Note 6: 
+&gt; #   Add in predictions for NA levels of 
+&gt; #   appCol. 
+&gt; 
+&gt; # Note 7: 
+&gt; #   Add in predictions for levels of appCol that 
+&gt; #   weren’t known during training. 
+&gt; 
+&gt; # Note 8: 
+&gt; #   Return vector of predictions. 
+&gt; 
+[1] &quot;############################### end  74 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;############################### start  75 Mon Nov  7 20:19:18 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00075_example_6.5_of_section_6.2.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.5 of section 6.2.1 
+&gt; # (example 6.5 of section 6.2.1)  : Memorization methods : Building single-variable models : Using categorical features 
+&gt; # Title: Applying single-categorical variable models to all of our datasets 
+&gt; 
+&gt; for(v in catVars) {
+   pi &lt;- paste(&#39;pred&#39;,v,sep=&#39;&#39;)
+   dTrain[,pi] &lt;- mkPredC(dTrain[,outcome],dTrain[,v],dTrain[,v])
+   dCal[,pi] &lt;- mkPredC(dTrain[,outcome],dTrain[,v],dCal[,v])
+   dTest[,pi] &lt;- mkPredC(dTrain[,outcome],dTrain[,v],dTest[,v])
+ }
+[1] &quot;############################### end  75 Mon Nov  7 20:19:20 2016&quot;
+[1] &quot;############################### start  76 Mon Nov  7 20:19:20 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00076_example_6.6_of_section_6.2.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.6 of section 6.2.1 
+&gt; # (example 6.6 of section 6.2.1)  : Memorization methods : Building single-variable models : Using categorical features 
+&gt; # Title: Scoring categorical variables by AUC 
+&gt; 
+&gt; library(&#39;ROCR&#39;)
+
+Loading required package: gplots
+
+
+Attaching package: &#39;gplots&#39;
+
+The following object is masked from &#39;package:stats&#39;:
+
+    lowess
+
+
+&gt; calcAUC &lt;- function(predcol,outcol) {
+     perf &lt;- performance(prediction(predcol,outcol==pos),&#39;auc&#39;)
+     as.numeric(perf@y.values)
+  }
+
+&gt; for(v in catVars) {
+    pi &lt;- paste(&#39;pred&#39;,v,sep=&#39;&#39;)
+    aucTrain &lt;- calcAUC(dTrain[,pi],dTrain[,outcome])
+    if(aucTrain&gt;=0.8) {
+       aucCal &lt;- calcAUC(dCal[,pi],dCal[,outcome])
+       print(sprintf(&quot;%s, trainAUC: %4.3f calibrationAUC: %4.3f&quot;,
+         pi,aucTrain,aucCal))
+    }
+  }
+[1] &quot;predVar200, trainAUC: 0.830 calibrationAUC: 0.565&quot;
+[1] &quot;predVar202, trainAUC: 0.827 calibrationAUC: 0.525&quot;
+[1] &quot;predVar214, trainAUC: 0.830 calibrationAUC: 0.565&quot;
+[1] &quot;predVar217, trainAUC: 0.897 calibrationAUC: 0.553&quot;
+
+&gt; ## [1] &quot;predVar200, trainAUC: 0.828 calibrationAUC: 0.527&quot;
+&gt; ## [1] &quot;predVar202, trainAUC: 0.829 calibrationAUC: 0.522&quot;
+&gt; ## [1] &quot;predVar214, trainAUC: 0.828 calibrationAUC: 0.527&quot;
+&gt; ## [1] &quot;predVar217, trainAUC: 0.898 calibrationAUC: 0.553&quot;
+&gt; 
+[1] &quot;############################### end  76 Mon Nov  7 20:19:21 2016&quot;
+[1] &quot;############################### start  77 Mon Nov  7 20:19:21 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00077_example_6.7_of_section_6.2.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.7 of section 6.2.2 
+&gt; # (example 6.7 of section 6.2.2)  : Memorization methods : Building single-variable models : Using numeric features 
+&gt; # Title: Scoring numeric variables by AUC 
+&gt; 
+&gt; mkPredN &lt;- function(outCol,varCol,appCol) {
+    cuts &lt;- unique(as.numeric(quantile(varCol,
+       probs=seq(0, 1, 0.1),na.rm=T)))
+    varC &lt;- cut(varCol,cuts)
+    appC &lt;- cut(appCol,cuts)
+    mkPredC(outCol,varC,appC)
+ }
+
+&gt; for(v in numericVars) {
+    pi &lt;- paste(&#39;pred&#39;,v,sep=&#39;&#39;)
+    dTrain[,pi] &lt;- mkPredN(dTrain[,outcome],dTrain[,v],dTrain[,v])
+    dTest[,pi] &lt;- mkPredN(dTrain[,outcome],dTrain[,v],dTest[,v])
+    dCal[,pi] &lt;- mkPredN(dTrain[,outcome],dTrain[,v],dCal[,v])
+    aucTrain &lt;- calcAUC(dTrain[,pi],dTrain[,outcome])
+    if(aucTrain&gt;=0.55) {
+       aucCal &lt;- calcAUC(dCal[,pi],dCal[,outcome])
+       print(sprintf(&quot;%s, trainAUC: %4.3f calibrationAUC: %4.3f&quot;,
+         pi,aucTrain,aucCal))
+    }
+  }
+[1] &quot;predVar6, trainAUC: 0.557 calibrationAUC: 0.554&quot;
+[1] &quot;predVar7, trainAUC: 0.555 calibrationAUC: 0.565&quot;
+[1] &quot;predVar13, trainAUC: 0.568 calibrationAUC: 0.553&quot;
+[1] &quot;predVar73, trainAUC: 0.608 calibrationAUC: 0.616&quot;
+[1] &quot;predVar74, trainAUC: 0.574 calibrationAUC: 0.566&quot;
+[1] &quot;predVar81, trainAUC: 0.558 calibrationAUC: 0.542&quot;
+[1] &quot;predVar113, trainAUC: 0.557 calibrationAUC: 0.567&quot;
+[1] &quot;predVar126, trainAUC: 0.635 calibrationAUC: 0.629&quot;
+[1] &quot;predVar140, trainAUC: 0.561 calibrationAUC: 0.560&quot;
+[1] &quot;predVar189, trainAUC: 0.574 calibrationAUC: 0.599&quot;
+
+&gt; ## [1] &quot;predVar6, trainAUC: 0.557 calibrationAUC: 0.554&quot;
+&gt; ## [1] &quot;predVar7, trainAUC: 0.555 calibrationAUC: 0.565&quot;
+&gt; ## [1] &quot;predVar13, trainAUC: 0.568 calibrationAUC: 0.553&quot;
+&gt; ## [1] &quot;predVar73, trainAUC: 0.608 calibrationAUC: 0.616&quot;
+&gt; ## [1] &quot;predVar74, trainAUC: 0.574 calibrationAUC: 0.566&quot;
+&gt; ## [1] &quot;predVar81, trainAUC: 0.558 calibrationAUC: 0.542&quot;
+&gt; ## [1] &quot;predVar113, trainAUC: 0.557 calibrationAUC: 0.567&quot;
+&gt; ## [1] &quot;predVar126, trainAUC: 0.635 calibrationAUC: 0.629&quot;
+&gt; ## [1] &quot;predVar140, trainAUC: 0.561 calibrationAUC: 0.560&quot;
+&gt; ## [1] &quot;predVar189, trainAUC: 0.574 calibrationAUC: 0.599&quot;
+&gt; 
+[1] &quot;############################### end  77 Mon Nov  7 20:19:39 2016&quot;
+[1] &quot;############################### start  78 Mon Nov  7 20:19:39 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00078_example_6.8_of_section_6.2.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.8 of section 6.2.2 
+&gt; # (example 6.8 of section 6.2.2)  : Memorization methods : Building single-variable models : Using numeric features 
+&gt; # Title: Plotting variable performance 
+&gt; 
+&gt; library(&#39;ggplot2&#39;)
+
+&gt; ggplot(data=dCal) +
+    geom_density(aes(x=predVar126,color=as.factor(churn)))</code></pre>
+<div class="figure">
+<img src="rCh06_files/figure-markdown_github/ch6ex-1.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  78 Mon Nov  7 20:19:40 2016&quot;
+[1] &quot;############################### start  79 Mon Nov  7 20:19:40 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00079_example_6.9_of_section_6.2.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.9 of section 6.2.3 
+&gt; # (example 6.9 of section 6.2.3)  : Memorization methods : Building single-variable models : Using cross-validation to estimate effects of overfitting 
+&gt; # Title: Running a repeated cross-validation experiment 
+&gt; 
+&gt; var &lt;- &#39;Var217&#39;
+
+&gt; aucs &lt;- rep(0,100)
+
+&gt; for(rep in 1:length(aucs)) {      # Note: 1 
+    useForCalRep &lt;- rbinom(n=dim(dTrainAll)[[1]],size=1,prob=0.1)&gt;0     # Note: 2 
+    predRep &lt;- mkPredC(dTrainAll[!useForCalRep,outcome],    # Note: 3 
+       dTrainAll[!useForCalRep,var],
+       dTrainAll[useForCalRep,var])
+    aucs[rep] &lt;- calcAUC(predRep,dTrainAll[useForCalRep,outcome])   # Note: 4 
+  }
+
+&gt; mean(aucs)
+[1] 0.5548469
+
+&gt; ## [1] 0.5556656
+&gt; sd(aucs)
+[1] 0.01569641
+
+&gt; ## [1] 0.01569345
+&gt; 
+&gt; # Note 1: 
+&gt; #   For 100 iterations... 
+&gt; 
+&gt; # Note 2: 
+&gt; #   ...select a random subset of about 10% of the training data as hold-out set,... 
+&gt; 
+&gt; # Note 3: 
+&gt; #   ...use the random 90% of training data to train model and evaluate that model on hold-out 
+&gt; #   set,... 
+&gt; 
+&gt; # Note 4: 
+&gt; #   ...calculate resulting model’s AUC using hold-out set; store that value and repeat. 
+&gt; 
+[1] &quot;############################### end  79 Mon Nov  7 20:19:43 2016&quot;
+[1] &quot;############################### start  80 Mon Nov  7 20:19:43 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00080_example_6.10_of_section_6.2.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.10 of section 6.2.3 
+&gt; # (example 6.10 of section 6.2.3)  : Memorization methods : Building single-variable models : Using cross-validation to estimate effects of overfitting 
+&gt; # Title: Empirically cross-validating performance 
+&gt; 
+&gt; fCross &lt;- function() {
+    useForCalRep &lt;- rbinom(n=dim(dTrainAll)[[1]],size=1,prob=0.1)&gt;0
+    predRep &lt;- mkPredC(dTrainAll[!useForCalRep,outcome],
+       dTrainAll[!useForCalRep,var],
+       dTrainAll[useForCalRep,var])
+    calcAUC(predRep,dTrainAll[useForCalRep,outcome])
+ }
+
+&gt; aucs &lt;- replicate(100,fCross())
+[1] &quot;############################### end  80 Mon Nov  7 20:19:46 2016&quot;
+[1] &quot;############################### start  81 Mon Nov  7 20:19:46 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00081_example_6.11_of_section_6.3.1.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.11 of section 6.3.1 
+&gt; # (example 6.11 of section 6.3.1)  : Memorization methods : Building models using many variables : Variable selection 
+&gt; # Title: Basic variable selection 
+&gt; 
+&gt; #    Each variable we use represents a chance of explaining
+&gt; # more of the outcome variation (a chance of building a better
+&gt; # model) but also represents a possible source of noise and
+&gt; # overfitting. To control this effect, we often preselect
+&gt; # which subset of variables we’ll use to fit. Variable
+&gt; # selection can be an important defensive modeling step even
+&gt; # for types of models that “don’t need it” (as seen with
+&gt; # decision trees in section 6.3.2).  Listing 6.11 shows a
+&gt; # hand-rolled variable selection loop where each variable is
+&gt; # scored according to a deviance inspired score, where a
+&gt; # variable is scored with a bonus proportional to the change
+&gt; # in in scaled log likelihood of the training data.  We could
+&gt; # also try an AIC (Akaike information criterion) by
+&gt; # subtracting a penalty proportional to the complexity of the
+&gt; # variable (which in this case is 2^entropy for categorical
+&gt; # variables and a stand-in of 1 for numeric variables).  The
+&gt; # score is a bit ad hoc, but tends to work well in selecting
+&gt; # variables. Notice we’re using performance on the calibration
+&gt; # set (not the training set) to pick variables. Note that we
+&gt; # don’t use the test set for calibration; to do so lessens the
+&gt; # reliability of the test set for model quality confirmation.
+&gt; 
+&gt; logLikelyhood &lt;- function(outCol,predCol) {   # Note: 1 
+   sum(ifelse(outCol==pos,log(predCol),log(1-predCol)))
+ }
+
+&gt; selVars &lt;- c()
+
+&gt; minStep &lt;- 5
+
+&gt; baseRateCheck &lt;- logLikelyhood(dCal[,outcome],
+    sum(dCal[,outcome]==pos)/length(dCal[,outcome]))
+
+&gt; for(v in catVars) {   # Note: 2 
+   pi &lt;- paste(&#39;pred&#39;,v,sep=&#39;&#39;)
+   liCheck &lt;- 2*((logLikelyhood(dCal[,outcome],dCal[,pi]) -
+       baseRateCheck))
+   if(liCheck&gt;minStep) {
+      print(sprintf(&quot;%s, calibrationScore: %g&quot;,
+         pi,liCheck))
+      selVars &lt;- c(selVars,pi)
+   }
+ }
+[1] &quot;predVar194, calibrationScore: 5.25759&quot;
+[1] &quot;predVar201, calibrationScore: 5.25521&quot;
+[1] &quot;predVar204, calibrationScore: 5.37414&quot;
+[1] &quot;predVar205, calibrationScore: 24.2323&quot;
+[1] &quot;predVar206, calibrationScore: 34.4434&quot;
+[1] &quot;predVar210, calibrationScore: 10.6681&quot;
+[1] &quot;predVar212, calibrationScore: 6.23409&quot;
+[1] &quot;predVar218, calibrationScore: 13.2455&quot;
+[1] &quot;predVar221, calibrationScore: 12.4098&quot;
+[1] &quot;predVar225, calibrationScore: 22.9074&quot;
+[1] &quot;predVar226, calibrationScore: 6.68931&quot;
+[1] &quot;predVar228, calibrationScore: 15.9644&quot;
+[1] &quot;predVar229, calibrationScore: 24.4946&quot;
+
+&gt; for(v in numericVars) {   # Note: 3 
+   pi &lt;- paste(&#39;pred&#39;,v,sep=&#39;&#39;)
+   liCheck &lt;- 2*((logLikelyhood(dCal[,outcome],dCal[,pi]) -
+       baseRateCheck))
+   if(liCheck&gt;=minStep) {
+      print(sprintf(&quot;%s, calibrationScore: %g&quot;,
+         pi,liCheck))
+      selVars &lt;- c(selVars,pi)
+   }
+ }
+[1] &quot;predVar6, calibrationScore: 13.2431&quot;
+[1] &quot;predVar7, calibrationScore: 18.685&quot;
+[1] &quot;predVar13, calibrationScore: 10.0632&quot;
+[1] &quot;predVar28, calibrationScore: 11.3864&quot;
+[1] &quot;predVar65, calibrationScore: 9.96938&quot;
+[1] &quot;predVar72, calibrationScore: 12.5353&quot;
+[1] &quot;predVar73, calibrationScore: 48.2524&quot;
+[1] &quot;predVar74, calibrationScore: 19.6324&quot;
+[1] &quot;predVar81, calibrationScore: 8.8741&quot;
+[1] &quot;predVar113, calibrationScore: 23.136&quot;
+[1] &quot;predVar125, calibrationScore: 6.06029&quot;
+[1] &quot;predVar126, calibrationScore: 74.9556&quot;
+[1] &quot;predVar134, calibrationScore: 5.68144&quot;
+[1] &quot;predVar140, calibrationScore: 16.1816&quot;
+[1] &quot;predVar144, calibrationScore: 15.9858&quot;
+[1] &quot;predVar189, calibrationScore: 42.3059&quot;
+
+&gt; # Note 1: 
+&gt; #   Define a convenience function to compute log 
+&gt; #   likelihood. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Run through categorical variables and pick 
+&gt; #   based on a deviance improvement (related to 
+&gt; #   difference in log likelihoods; see chapter 
+&gt; #   3). 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Run through numeric variables and pick 
+&gt; #   based on a deviance improvement. 
+&gt; 
+[1] &quot;############################### end  81 Mon Nov  7 20:19:46 2016&quot;
+[1] &quot;############################### start  83 Mon Nov  7 20:19:46 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00083_example_6.13_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.13 of section 6.3.2 
+&gt; # (example 6.13 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Building a bad decision tree 
+&gt; 
+&gt; library(&#39;rpart&#39;)
+
+&gt; fV &lt;- paste(outcome,&#39;&gt;0 ~ &#39;,
+    paste(c(catVars,numericVars),collapse=&#39; + &#39;),sep=&#39;&#39;)
+
+&gt; tmodel &lt;- rpart(fV,data=dTrain)
+
+&gt; print(calcAUC(predict(tmodel,newdata=dTrain),dTrain[,outcome]))
+[1] 0.9241265
+
+&gt; ## [1] 0.9241265
+&gt; print(calcAUC(predict(tmodel,newdata=dTest),dTest[,outcome]))
+[1] 0.5266172
+
+&gt; ## [1] 0.5266172
+&gt; print(calcAUC(predict(tmodel,newdata=dCal),dCal[,outcome]))
+[1] 0.5126917
+
+&gt; ## [1] 0.5126917
+&gt; 
+[1] &quot;############################### end  83 Mon Nov  7 20:20:14 2016&quot;
+[1] &quot;############################### start  84 Mon Nov  7 20:20:14 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00084_example_6.14_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.14 of section 6.3.2 
+&gt; # (example 6.14 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Building another bad decision tree 
+&gt; 
+&gt; tVars &lt;- paste(&#39;pred&#39;,c(catVars,numericVars),sep=&#39;&#39;)
+
+&gt; fV2 &lt;- paste(outcome,&#39;&gt;0 ~ &#39;,paste(tVars,collapse=&#39; + &#39;),sep=&#39;&#39;)
+
+&gt; tmodel &lt;- rpart(fV2,data=dTrain)
+
+&gt; print(calcAUC(predict(tmodel,newdata=dTrain),dTrain[,outcome]))
+[1] 0.928669
+
+&gt; ## [1] 0.928669
+&gt; print(calcAUC(predict(tmodel,newdata=dTest),dTest[,outcome]))
+[1] 0.5390648
+
+&gt; ## [1] 0.5390648
+&gt; print(calcAUC(predict(tmodel,newdata=dCal),dCal[,outcome]))
+[1] 0.5384152
+
+&gt; ## [1] 0.5384152
+&gt; 
+[1] &quot;############################### end  84 Mon Nov  7 20:20:29 2016&quot;
+[1] &quot;############################### start  85 Mon Nov  7 20:20:29 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00085_example_6.15_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.15 of section 6.3.2 
+&gt; # (example 6.15 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Building yet another bad decision tree 
+&gt; 
+&gt; tmodel &lt;- rpart(fV2,data=dTrain,
+    control=rpart.control(cp=0.001,minsplit=1000,
+       minbucket=1000,maxdepth=5)
+  )
+
+&gt; print(calcAUC(predict(tmodel,newdata=dTrain),dTrain[,outcome]))
+[1] 0.9421195
+
+&gt; ## [1] 0.9421195
+&gt; print(calcAUC(predict(tmodel,newdata=dTest),dTest[,outcome]))
+[1] 0.5794633
+
+&gt; ## [1] 0.5794633
+&gt; print(calcAUC(predict(tmodel,newdata=dCal),dCal[,outcome]))
+[1] 0.547967
+
+&gt; ## [1] 0.547967
+&gt; 
+[1] &quot;############################### end  85 Mon Nov  7 20:20:39 2016&quot;
+[1] &quot;############################### start  86 Mon Nov  7 20:20:39 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00086_example_6.16_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.16 of section 6.3.2 
+&gt; # (example 6.16 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Building a better decision tree 
+&gt; 
+&gt; f &lt;- paste(outcome,&#39;&gt;0 ~ &#39;,paste(selVars,collapse=&#39; + &#39;),sep=&#39;&#39;)
+
+&gt; tmodel &lt;- rpart(f,data=dTrain,
+    control=rpart.control(cp=0.001,minsplit=1000,
+       minbucket=1000,maxdepth=5)
+  )
+
+&gt; print(calcAUC(predict(tmodel,newdata=dTrain),dTrain[,outcome]))
+[1] 0.6906852
+
+&gt; ## [1] 0.6906852
+&gt; print(calcAUC(predict(tmodel,newdata=dTest),dTest[,outcome]))
+[1] 0.6843595
+
+&gt; ## [1] 0.6843595
+&gt; print(calcAUC(predict(tmodel,newdata=dCal),dCal[,outcome]))
+[1] 0.6669301
+
+&gt; ## [1] 0.6669301
+&gt; 
+[1] &quot;############################### end  86 Mon Nov  7 20:20:41 2016&quot;
+[1] &quot;############################### start  87 Mon Nov  7 20:20:41 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00087_example_6.17_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.17 of section 6.3.2 
+&gt; # (example 6.17 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Printing the decision tree 
+&gt; 
+&gt; print(tmodel)
+n= 40518 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+ 1) root 40518 2769.3550 0.07379436  
+   2) predVar126&lt; 0.07366888 18188  726.4097 0.04167583  
+     4) predVar126&lt; 0.04391312 8804  189.7251 0.02203544 *
+     5) predVar126&gt;=0.04391312 9384  530.1023 0.06010230  
+      10) predVar189&lt; 0.08449448 8317  410.4571 0.05206204 *
+      11) predVar189&gt;=0.08449448 1067  114.9166 0.12277410 *
+   3) predVar126&gt;=0.07366888 22330 2008.9000 0.09995522  
+     6) predVar212&lt; 0.07944508 8386  484.2499 0.06153112  
+      12) predVar73&lt; 0.06813291 4084  167.5012 0.04285015 *
+      13) predVar73&gt;=0.06813291 4302  313.9705 0.07926546 *
+     7) predVar212&gt;=0.07944508 13944 1504.8230 0.12306370  
+      14) predVar218&lt; 0.07134103 6728  580.7390 0.09542212  
+        28) predVar126&lt; 0.1015407 3901  271.8426 0.07536529 *
+        29) predVar126&gt;=0.1015407 2827  305.1617 0.12309870  
+          58) predVar73&lt; 0.07804522 1452  110.0826 0.08264463 *
+          59) predVar73&gt;=0.07804522 1375  190.1935 0.16581820 *
+      15) predVar218&gt;=0.07134103 7216  914.1502 0.14883590  
+        30) predVar74&lt; 0.0797246 2579  239.3579 0.10352850 *
+        31) predVar74&gt;=0.0797246 4637  666.5538 0.17403490  
+          62) predVar189&lt; 0.06775545 1031  102.9486 0.11251210 *
+          63) predVar189&gt;=0.06775545 3606  558.5871 0.19162510 *
+
+&gt; ## n= 40518 
+&gt; ## 
+&gt; ## node), split, n, deviance, yval
+&gt; ##       * denotes terminal node
+&gt; ## 
+&gt; ##  1) root 40518 2769.3550 0.07379436  
+&gt; ##    2) predVar126&lt; 0.07366888 18188  726.4097 0.04167583  
+&gt; ##      4) predVar126&lt; 0.04391312 8804  189.7251 0.02203544 *
+&gt; ##      5) predVar126&gt;=0.04391312 9384  530.1023 0.06010230  
+&gt; ##       10) predVar189&lt; 0.08449448 8317  410.4571 0.05206204 *
+&gt; ##       11) predVar189&gt;=0.08449448 1067  114.9166 0.12277410 *
+&gt; ##    3) predVar126&gt;=0.07366888 22330 2008.9000 0.09995522  
+&gt; ##      6) predVar212&lt; 0.07944508 8386  484.2499 0.06153112  
+&gt; ##       12) predVar73&lt; 0.06813291 4084  167.5012 0.04285015 *
+&gt; ##       13) predVar73&gt;=0.06813291 4302  313.9705 0.07926546 *
+&gt; ##      7) predVar212&gt;=0.07944508 13944 1504.8230 0.12306370  
+&gt; ##       14) predVar218&lt; 0.07134103 6728  580.7390 0.09542212  
+&gt; ##         28) predVar126&lt; 0.1015407 3901  271.8426 0.07536529 *
+&gt; ##         29) predVar126&gt;=0.1015407 2827  305.1617 0.12309870  
+&gt; ##           58) predVar73&lt; 0.07804522 1452  110.0826 0.08264463 *
+&gt; ##           59) predVar73&gt;=0.07804522 1375  190.1935 0.16581820 *
+&gt; ##       15) predVar218&gt;=0.07134103 7216  914.1502 0.14883590  
+&gt; ##         30) predVar74&lt; 0.0797246 2579  239.3579 0.10352850 *
+&gt; ##         31) predVar74&gt;=0.0797246 4637  666.5538 0.17403490  
+&gt; ##           62) predVar189&lt; 0.06775545 1031  102.9486 0.11251210 *
+&gt; ##           63) predVar189&gt;=0.06775545 3606  558.5871 0.19162510 *
+&gt; 
+[1] &quot;############################### end  87 Mon Nov  7 20:20:41 2016&quot;
+[1] &quot;############################### start  88 Mon Nov  7 20:20:41 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00088_example_6.18_of_section_6.3.2.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.18 of section 6.3.2 
+&gt; # (example 6.18 of section 6.3.2)  : Memorization methods : Building models using many variables : Using decision trees 
+&gt; # Title: Plotting the decision tree 
+&gt; 
+&gt; par(cex=0.7)
+
+&gt; plot(tmodel)</code></pre>
+<div class="figure">
+<img src="rCh06_files/figure-markdown_github/ch6ex-2.png" alt="" />
+
+</div>
+<pre><code>&gt; text(tmodel)
+[1] &quot;############################### end  88 Mon Nov  7 20:20:42 2016&quot;
+[1] &quot;############################### start  89 Mon Nov  7 20:20:42 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00089_example_6.19_of_section_6.3.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.19 of section 6.3.3 
+&gt; # (example 6.19 of section 6.3.3)  : Memorization methods : Building models using many variables : Using nearest neighbor methods 
+&gt; # Title: Running k-nearest neighbors 
+&gt; 
+&gt; library(&#39;class&#39;)
+
+&gt; nK &lt;- 200
+
+&gt; knnTrain &lt;- dTrain[,selVars]      # Note: 1 
+
+&gt; knnCl &lt;- dTrain[,outcome]==pos    # Note: 2 
+
+&gt; knnPred &lt;- function(df) {     # Note: 3 
+     knnDecision &lt;- knn(knnTrain,df,knnCl,k=nK,prob=T)
+     ifelse(knnDecision==TRUE,  # Note: 4 
+        attributes(knnDecision)$prob,
+        1-(attributes(knnDecision)$prob))
+ }
+
+&gt; print(calcAUC(knnPred(dTrain[,selVars]),dTrain[,outcome]))
+[1] 0.7437617
+
+&gt; ## [1] 0.7443927
+&gt; print(calcAUC(knnPred(dCal[,selVars]),dCal[,outcome]))
+[1] 0.7131476
+
+&gt; ## [1] 0.7119394
+&gt; print(calcAUC(knnPred(dTest[,selVars]),dTest[,outcome]))
+[1] 0.7179175
+
+&gt; ## [1] 0.718256
+&gt; 
+&gt; # Note 1: 
+&gt; #   Build a data frame with only the variables we 
+&gt; #   wish to use for classification. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Build a vector with the known training 
+&gt; #   outcomes. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Bind the knn() training function with our data 
+&gt; #   in a new function. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Convert knn’s unfortunate convention of 
+&gt; #   calculating probability as “proportion of the 
+&gt; #   votes for the winning class” into the more useful 
+&gt; #   “calculated probability of being a positive 
+&gt; #   example.” 
+&gt; 
+[1] &quot;############################### end  89 Mon Nov  7 20:22:15 2016&quot;
+[1] &quot;############################### start  90 Mon Nov  7 20:22:15 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00090_example_6.20_of_section_6.3.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.20 of section 6.3.3 
+&gt; # (example 6.20 of section 6.3.3)  : Memorization methods : Building models using many variables : Using nearest neighbor methods 
+&gt; # Title: Platting 200-nearest neighbor performance 
+&gt; 
+&gt; dCal$kpred &lt;- knnPred(dCal[,selVars])
+
+&gt; ggplot(data=dCal) +
+    geom_density(aes(x=kpred,
+       color=as.factor(churn),linetype=as.factor(churn)))</code></pre>
+<div class="figure">
+<img src="rCh06_files/figure-markdown_github/ch6ex-3.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  90 Mon Nov  7 20:22:24 2016&quot;
+[1] &quot;############################### start  91 Mon Nov  7 20:22:24 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00091_example_6.21_of_section_6.3.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.21 of section 6.3.3 
+&gt; # (example 6.21 of section 6.3.3)  : Memorization methods : Building models using many variables : Using nearest neighbor methods 
+&gt; # Title: Plotting the receiver operating characteristic curve 
+&gt; 
+&gt; plotROC &lt;- function(predcol,outcol) {
+    perf &lt;- performance(prediction(predcol,outcol==pos),&#39;tpr&#39;,&#39;fpr&#39;)
+    pf &lt;- data.frame(
+       FalsePositiveRate=perf@x.values[[1]],
+       TruePositiveRate=perf@y.values[[1]])
+    ggplot() +
+       geom_line(data=pf,aes(x=FalsePositiveRate,y=TruePositiveRate)) +
+       geom_line(aes(x=c(0,1),y=c(0,1)))
+ }
+
+&gt; print(plotROC(knnPred(dTest[,selVars]),dTest[,outcome]))</code></pre>
+<div class="figure">
+<img src="rCh06_files/figure-markdown_github/ch6ex-4.png" alt="" />
+
+</div>
+<pre><code>[1] &quot;############################### end  91 Mon Nov  7 20:22:33 2016&quot;
+[1] &quot;############################### start  92 Mon Nov  7 20:22:33 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00092_example_6.22_of_section_6.3.3.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.22 of section 6.3.3 
+&gt; # (example 6.22 of section 6.3.3)  : Memorization methods : Building models using many variables : Using nearest neighbor methods 
+&gt; # Title: Plotting the performance of a logistic regression model 
+&gt; 
+&gt; gmodel &lt;- glm(as.formula(f),data=dTrain,family=binomial(link=&#39;logit&#39;))
+
+&gt; print(calcAUC(predict(gmodel,newdata=dTrain),dTrain[,outcome]))
+[1] 0.7381345
+
+&gt; ## [1] 0.7309537
+&gt; print(calcAUC(predict(gmodel,newdata=dTest),dTest[,outcome]))
+[1] 0.7270349
+
+&gt; ## [1] 0.7234645
+&gt; print(calcAUC(predict(gmodel,newdata=dCal),dCal[,outcome]))
+[1] 0.7143337
+
+&gt; ## [1] 0.7170824
+&gt; 
+[1] &quot;############################### end  92 Mon Nov  7 20:22:34 2016&quot;
+[1] &quot;############################### start  93 Mon Nov  7 20:22:34 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00093_example_6.23_of_section_6.3.4.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.23 of section 6.3.4 
+&gt; # (example 6.23 of section 6.3.4)  : Memorization methods : Building models using many variables : Using Naive Bayes 
+&gt; # Title: Building, applying, and evaluating a Naive Bayes model 
+&gt; 
+&gt; pPos &lt;- sum(dTrain[,outcome]==pos)/length(dTrain[,outcome])
+
+&gt; nBayes &lt;- function(pPos,pf) {     # Note: 1 
+    pNeg &lt;- 1 - pPos
+    smoothingEpsilon &lt;- 1.0e-5
+    scorePos &lt;- log(pPos + smoothingEpsilon) + 
+       rowSums(log(pf/pPos + smoothingEpsilon))     # Note: 2 
+    scoreNeg &lt;- log(pNeg + smoothingEpsilon) +
+       rowSums(log((1-pf)/(1-pPos) + smoothingEpsilon))     # Note: 3 
+    m &lt;- pmax(scorePos,scoreNeg)
+    expScorePos &lt;- exp(scorePos-m)
+    expScoreNeg &lt;- exp(scoreNeg-m)  # Note: 4 
+    expScorePos/(expScorePos+expScoreNeg)   # Note: 5 
+ }
+
+&gt; pVars &lt;- paste(&#39;pred&#39;,c(numericVars,catVars),sep=&#39;&#39;)
+
+&gt; dTrain$nbpredl &lt;- nBayes(pPos,dTrain[,pVars])
+
+&gt; dCal$nbpredl &lt;- nBayes(pPos,dCal[,pVars])
+
+&gt; dTest$nbpredl &lt;- nBayes(pPos,dTest[,pVars])   # Note: 6 
+
+&gt; print(calcAUC(dTrain$nbpredl,dTrain[,outcome]))
+[1] 0.9757348
+
+&gt; ## [1] 0.9757348
+&gt; print(calcAUC(dCal$nbpredl,dCal[,outcome]))
+[1] 0.5995206
+
+&gt; ## [1] 0.5995206
+&gt; print(calcAUC(dTest$nbpredl,dTest[,outcome]))
+[1] 0.5956515
+
+&gt; ## [1] 0.5956515  # Note: 7
+&gt; 
+&gt; # Note 1: 
+&gt; #   Define a function that performs the Naive 
+&gt; #   Bayes prediction. 
+&gt; 
+&gt; # Note 2: 
+&gt; #   For each row, compute (with a smoothing term) 
+&gt; #   the sum of log(P[positive &amp; 
+&gt; #   evidence_i]/P[positive]) across all columns. This 
+&gt; #   is equivalent to the log of the product of 
+&gt; #   P[evidence_i | positive] up to terms that don’t 
+&gt; #   depend on the positive/negative outcome. 
+&gt; 
+&gt; # Note 3: 
+&gt; #   For each row, compute (with a smoothing term) 
+&gt; #   the sum of log(P[negative &amp; 
+&gt; #   evidence_i]/P[negative]) across all columns. This 
+&gt; #   is equivalent to the log of the product of 
+&gt; #   P[evidence_i | negative] up to terms that don’t 
+&gt; #   depend on the positive/negative outcome. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Exponentiate to turn sums back into products, 
+&gt; #   but make sure we don’t cause a floating point 
+&gt; #   overflow in doing so. 
+&gt; 
+&gt; # Note 5: 
+&gt; #   Use the fact that the predicted positive 
+&gt; #   probability plus the predicted negative 
+&gt; #   probability should sum to 1.0 to find and 
+&gt; #   eliminate Z. Return the correctly scaled predicted 
+&gt; #   odds of being positive as our forecast. 
+&gt; 
+&gt; # Note 6: 
+&gt; #   Apply the function to make the predictions. 
+&gt; 
+&gt; # Note 7: 
+&gt; #   Calculate the AUCs. Notice the 
+&gt; #   overfit—fantastic performance on the training 
+&gt; #   set that isn’t repeated on the calibration or test 
+&gt; #   sets. 
+&gt; 
+[1] &quot;############################### end  93 Mon Nov  7 20:22:35 2016&quot;
+[1] &quot;############################### start  94 Mon Nov  7 20:22:35 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c06_Memorization_methods/00094_example_6.24_of_section_6.3.4.R&quot;
+[1] &quot;#####   in directory ../KDD2009&quot;
+
+&gt; # example 6.24 of section 6.3.4 
+&gt; # (example 6.24 of section 6.3.4)  : Memorization methods : Building models using many variables : Using Naive Bayes 
+&gt; # Title: Using a Naive Bayes package 
+&gt; 
+&gt; library(&#39;e1071&#39;)
+
+&gt; lVars &lt;- c(catVars,numericVars)
+
+&gt; ff &lt;- paste(&#39;as.factor(&#39;,outcome,&#39;&gt;0) ~ &#39;,
+    paste(lVars,collapse=&#39; + &#39;),sep=&#39;&#39;)
+
+&gt; nbmodel &lt;- naiveBayes(as.formula(ff),data=dTrain)
+
+&gt; dTrain$nbpred &lt;- predict(nbmodel,newdata=dTrain,type=&#39;raw&#39;)[,&#39;TRUE&#39;]
+
+&gt; dCal$nbpred &lt;- predict(nbmodel,newdata=dCal,type=&#39;raw&#39;)[,&#39;TRUE&#39;]
+
+&gt; dTest$nbpred &lt;- predict(nbmodel,newdata=dTest,type=&#39;raw&#39;)[,&#39;TRUE&#39;]
+
+&gt; calcAUC(dTrain$nbpred,dTrain[,outcome])
+[1] 0.4643591
+
+&gt; ## [1] 0.4643591
+&gt; calcAUC(dCal$nbpred,dCal[,outcome])
+[1] 0.5544484
+
+&gt; ## [1] 0.5544484
+&gt; calcAUC(dTest$nbpred,dTest[,outcome])
+[1] 0.5679519
+
+&gt; ## [1] 0.5679519
+&gt; 
+[1] &quot;############################### end  94 Mon Nov  7 20:24:28 2016&quot;</code></pre>

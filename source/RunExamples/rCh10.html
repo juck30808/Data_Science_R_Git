@@ -1,0 +1,124 @@
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">ls</span>())
+<span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)
+<span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/c10_Documentation_and_deployment&#39;</span>,
+      <span class="st">&#39;../Buzz&#39;</span>,<span class="dt">last=</span><span class="dv">221</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  204 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;#####  running  /Users/johnmount/Documents/work/PracticalDataScienceWithR/zmPDSwR/RunExamples/replacements/00204_informalexample_10.1_of_section_10.2.1.R&quot;
+[1] &quot;#####   in directory ../Buzz&quot;
+
+&gt; # can&#39;t &quot;knit&quot; inside a knitr document
+[1] &quot;############################### end  204 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;############################### start  211 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c10_Documentation_and_deployment/00211_example_10.7_of_section_10.3.1.R&quot;
+[1] &quot;#####   in directory ../Buzz&quot;
+
+&gt; # example 10.7 of section 10.3.1 
+&gt; # (example 10.7 of section 10.3.1)  : Documentation and deployment : Using comments and version control for running documentation : Writing effective comments 
+&gt; # Title: Example code comment 
+&gt; 
+&gt; #    Return the pseudo logarithm of x, which is close to
+&gt; # sign(x)*log10(abs(x)) for x such that abs(x) is large
+&gt; # and doesn&#39;t &quot;blow up&quot; near zero.  Useful
+&gt; # for transforming wide-range variables that may be negative
+&gt; # (like profit/loss).
+&gt; # See: http://www.win-vector.com/blog
+&gt; #  /2012/03/modeling-trick-the-signed-pseudo-logarithm/
+&gt; #    NB: This transform has the undesirable property of making most
+&gt; # signed distributions appear bimodal around the origin, no matter
+&gt; # what the underlying distribution really looks like.
+&gt; # The argument x is assumed be numeric and can be a vector.
+&gt; pseudoLog10 &lt;- function(x) { asinh(x/2)/log(10) }
+[1] &quot;############################### end  211 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;############################### start  212 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c10_Documentation_and_deployment/00212_example_10.8_of_section_10.3.1.R&quot;
+[1] &quot;#####   in directory ../Buzz&quot;
+
+&gt; # example 10.8 of section 10.3.1 
+&gt; # (example 10.8 of section 10.3.1)  : Documentation and deployment : Using comments and version control for running documentation : Writing effective comments 
+&gt; # Title: Useless comment 
+&gt; 
+&gt; #######################################
+&gt; # Function: addone
+&gt; # Author: John Mount
+&gt; # Version: 1.3.11
+&gt; # Location: RSource/helperFns/addone.R
+&gt; # Date: 10/31/13
+&gt; # Arguments: x
+&gt; # Purpose: Adds one
+&gt; #######################################
+&gt; addone &lt;- function(x) { x + 1 }
+[1] &quot;############################### end  212 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;############################### start  213 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c10_Documentation_and_deployment/00213_example_10.9_of_section_10.3.1.R&quot;
+[1] &quot;#####   in directory ../Buzz&quot;
+
+&gt; # example 10.9 of section 10.3.1 
+&gt; # (example 10.9 of section 10.3.1)  : Documentation and deployment : Using comments and version control for running documentation : Writing effective comments 
+&gt; # Title: Worse than useless comment 
+&gt; 
+&gt; # adds one
+&gt; addtwo &lt;- function(x) { x + 2 }
+[1] &quot;############################### end  213 Fri Jun 17 10:43:36 2016&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">ls</span>())
+<span class="kw">source</span>(<span class="st">&#39;runDir.R&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)
+<span class="kw">runDir</span>(<span class="st">&#39;../CodeExamples/c10_Documentation_and_deployment&#39;</span>,
+      <span class="st">&#39;../Buzz&#39;</span>,<span class="dt">first=</span><span class="dv">225</span>)</code></pre></div>
+<pre><code>[1] &quot;############################### start  225 Fri Jun 17 10:43:36 2016&quot;
+[1] &quot;#####  running  ../CodeExamples/c10_Documentation_and_deployment/00225_example_10.18_of_section_10.4.2.R&quot;
+[1] &quot;#####   in directory ../Buzz&quot;
+
+&gt; # example 10.18 of section 10.4.2 
+&gt; # (example 10.18 of section 10.4.2)  : Documentation and deployment : Deploying models : Deploying models by export 
+&gt; # Title: Exporting the random forest model 
+&gt; 
+&gt; load(&#39;thRS500.Rdata&#39;)     # Note: 1 
+
+&gt; library(randomForest)     # Note: 2 
+
+randomForest 4.6-12
+
+Type rfNews() to see new features/changes/bug fixes.
+
+
+Attaching package: &#39;randomForest&#39;
+
+The following object is masked from &#39;package:ggplot2&#39;:
+
+    margin
+
+
+&gt; extractTrees &lt;- function(rfModel) {   # Note: 3 
+    ei &lt;- function(i) {
+       ti &lt;- getTree(rfModel,k=i,labelVar=T)
+       ti$nodeid &lt;- 1:dim(ti)[[1]]
+       ti$treeid &lt;- i
+       ti
+    }
+    nTrees &lt;- rfModel$ntree
+    do.call(&#39;rbind&#39;,sapply(1:nTrees,ei,simplify=F))
+ }
+
+&gt; write.table(extractTrees(fmodel),     # Note: 4 
+    file=&#39;rfmodel.tsv&#39;,row.names=F,sep=&#39;\t&#39;,quote=F)
+
+&gt; # Note 1: 
+&gt; #   Load the saved buzz workspace (includes the 
+&gt; #   random forest model). 
+&gt; 
+&gt; # Note 2: 
+&gt; #   Load the random forest library (loading the 
+&gt; #   workspace doesn’t load the library). 
+&gt; 
+&gt; # Note 3: 
+&gt; #   Define a function that joins the tree tables 
+&gt; #   from the random forest getTree() method into one 
+&gt; #   large table of trees. 
+&gt; 
+&gt; # Note 4: 
+&gt; #   Write the table of trees as a tab-separated 
+&gt; #   values table (easy for other software to 
+&gt; #   read). 
+&gt; 
+[1] &quot;############################### end  225 Fri Jun 17 10:43:37 2016&quot;</code></pre>
