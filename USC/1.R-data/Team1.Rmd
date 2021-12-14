@@ -1,0 +1,136 @@
+---
+title: "APP應用程式 數據分析初步報告"
+author: "Team1."
+date: "報告時間：2020/11/20"
+output: 
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: github
+---
+#install.packages(c("pander","kableExtra","prettydoc"))
+```{r, include=FALSE}
+wkDir = "/Users/juck30808/Documents/Github/USC_R_Git/1.R-data";   setwd(wkDir);
+Xfile = "/data/googleplaystore.csv"
+library(data.table)
+library(pander);   library(knitr);      library(kableExtra)
+```
+
+# (1) (KDD1) 數據取得 (-->X)
+
+```{r, echo=FALSE, warning=FALSE}
+X = read.csv(Xfile,fileEncoding="Big5"); 
+# dim(X0);   head(X0,2)   
+pander(paste0(">> (1) 交易數據(X): ",Xfile,", 共 ",dim(X)[1],"筆紀錄\n\n")); 
+pander(">> (2) 交易數據樣貌為: "); 
+kable(head(X,2)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+
+# (2) (KDD2) 數據探索 (X)
+
+## (2.1) (KDD2) 日期探索 (X)
+
+```{r, echo=FALSE, warning=FALSE}
+X$date = as.Date(X$date)
+pander(paste0(">> (1) 交易數據的日期範圍為: ",paste(range(X$date),collapse="--"),"\n\n"));  
+#-- [1] "2014-05-06" "2020-02-12"
+```
+
+## (2.2) (KDD2) 客戶探索 (X)
+
+```{r, echo=FALSE, warning=FALSE}
+X$cID = X$customer
+X$amount   = as.numeric(X$amount)
+X$quantity = as.integer(as.character(X$quantity))
+客戶數=length(unique(X$cID))
+pander(paste0(">> (1) 客戶人數共有: ",客戶數,"\n\n") );   #-- [1]  4342
+pander(paste0(">> (2) 客戶的造訪頻次範圍為: ",paste(range(table(X$cID)),collapse="--"),"\n\n"))   #-- [1]   1 938
+pander(paste0(">> (3) 交易紀錄數大於150次的客戶有: \n\n"))   #-- [1]   1 938
+kable(table(X$cID)[table(X$cID)>150]) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+
+## (2.3) (KDD2) 商品探索 (X)
+
+```{r, echo=FALSE, warning=FALSE}
+pander(paste0(">> (1) 商品品項共有: ",length(unique(X$product)),"\n\n") );   #-- [1]  12770
+pander(paste0(">> (2) 商品品類共有: ",length(unique(X$category)),"\n\n") );   #-- [1]  12770
+pander(paste0(">> (3) 商品品類的分布為: \n\n"))   #-- [1]   1 938
+kable(table(X$category)[order(table(X$category),decreasing=T)]) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+```
+
+# (3) (KDD3) 數據轉換 (X->Cv)
+
+```{r, echo=FALSE, warning=FALSE}
+X$invoiceNo = as.character(X$invoiceNo)
+X$cID = as.character(X$customer)
+setDT(X,key=c("cID","invoiceNo"))
+Cv0 = X[, .(date=unique(date), MM=sum(amount), TT=sum(quantity)), by=c("cID","invoiceNo") ];
+Cv  = Cv0[, .(D0=min(date), Df=max(date), DD=length(date), FF=length(invoiceNo), MM=sum(MM), TT=sum(TT)), by=cID]
+Cv$UU = Cv$MM / Cv$FF;     Cv$NN = Cv$TT / Cv$FF;   Cv$BB = (Cv$Df-Cv$D0)/Cv$DD
+#range(Cv$DD)   #--     1     409
+#range(Cv$FF)   #--     1       1
+#range(Cv$MM)   #--     0 1681712
+#range(Cv$BB)   #--   0.0   902.5
+Cv$DD0 = cut( Cv$DD, breaks=c(0,1,9,99,999,9999,99999));  
+# table(Cv$DD0)
+Cv$FF0 = cut( Cv$FF, breaks=c(0,1,9,99,999,9999,99999)); 
+Cv$MM0 = cut( Cv$MM, breaks=c(-99999,0,9999,99999,999999,9999999,99999999,1999999999)); 
+Cv$BB0 = cut( as.numeric(Cv$BB), breaks=c(-1,0,7,30,100,999));  
+Cv$Q0 = paste0(substr(Cv$D0,3,4), cut(as.integer(substr(Cv$D0,6,7)),breaks=c(0,3,6,9,12),labels=c("Q1","Q2","Q3","Q4")))
+Cv$Qf = paste0(substr(Cv$Df,3,4), cut(as.integer(substr(Cv$Df,6,7)),breaks=c(0,3,6,9,12),labels=c("Q1","Q2","Q3","Q4")))
+pander(paste0(">> (1) 客戶共有 ",dim(Cv)[1],"位\n\n"));
+pander(">> (2) 客戶數據樣貌為: ");
+kable(head(X,2)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+pander(">> (3) 說明：FF--造訪頻次，MM--消費金額，TT--購買件數，BB--回購週期，D0--首次來店日，Df--最近來店日")
+```
+
+# (4) (KDD4) 數據模型 (Cv)
+
+## (4.1) (KDD4) 客戶價值模型 (Cv.FF0,Cv.MM0)
+```{r, echo=FALSE, warning=FALSE}
+kable(addmargins(table(Cv$FF0,Cv$MM0))) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+pander(">> (1) 一次客XXX位，宜加強，尤其是XX位的萬元客。\n\n")
+pander(">> (2) 數次客近XXX位，可深耕，尤其是XXX位的十萬元客。\n\n")
+pander(">> (3) 超過十次客的XXX+XX位，應做進一步分析，並可深入做VIP方案。\n\n")
+pander(">> (4) 超過百次客的X+X+X位，可能為非會員，並可深入並做非會員分析。\n\n")
+```
+
+## (4.2) (KDD4) 客戶佇留模型 (Cv.Q0,Cv.Qf)
+```{r, echo=FALSE, warning=FALSE}
+kable(addmargins(table(Cv$Q0,Cv$Qf))) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+pander(">> (1) 2017Q1-2018Q3的新進客每季均超過XX人，而2018Q4-2020Q2的新進客大都少於XX人，值得注意。\n\n")
+pander(">> (2) 2019Q1開始，流失客大於新進客，要特別注意，而2019Q3-Q4的流失客均高達XXX+XXX人，應做回客動作。\n\n")
+pander(">> (3) 2020年的回客只有XX-XX位，Q2的新客只有XX位，需檢討。\n\n")
+```
+
+## (4.3) (KDD4) 客戶流失模型 (Cv.Qf,Cv.BB`)--整體
+```{r, echo=FALSE, warning=FALSE}
+kable(table(Cv$Qf,Cv$BB0)) %>%
+  kable_styling(c("striped", "bordered")) %>% kable_styling(full_width = F) %>% column_spec(1, bold = T)
+pander(">> (1) 2020年出現的客戶中，回購週期在0-7天內的有X+X位，應進一步分析。\n\n")
+pander(">> (2) 回購週期在7-30天者，有X+XX位在2020年尚未出現，應做分析，再做回客動作。\n\n")
+pander(">> (3) 2020年有XX+XX位回購週期在100天以上，值得進行追蹤。\n\n")
+```
+
+# (5) (KDD5) 數據初結
+
+## (5.1) 需檢討者
+* (4.2.1) 2017Q1-2018Q3的新進客每季均超過XX人，而2018Q4-2020Q2的新進客大都少於XX人，值得注意。
+* (4.2.3) 2020年的回客只有XX-XX位，Q2的新客只有XX位，需檢討。
+
+## (5.2) 可深入分析追蹤者
+* (4.1.3) 超過十次客的XXX+XX位，應做進一步分析，並可深入做VIP方案。
+* (4.1.4) 超過百次客的X+X+X位，可能為非會員，並可深入並做非會員分析。
+* (4.3.1) 2020年出現的客戶中，回購週期在0-7天內的有X+X位，應進一步分析。
+* (4.3.3) 2020年有XX+XX位回購週期在100天以上，值得進行追蹤。
+
+## (5.3) 可做回客動作者
+* (4.2.2) 2019Q1開始，流失客大於新進客，要特別注意，而2019Q3-Q4的流失客均高達XXX+XXX人，應做回客動作。
+* (4.3.2) 回購週期在7-30天者，有X+XX位在2020年尚未出現，應做分析，再做回客動作。
+
